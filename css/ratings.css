@@ -11,6 +11,7 @@
   font-weight: bold;
   color: black;
   font-family: tahoma;
+  margin-left: 8px;
 }
 .imdb-icon {
   background-image: url('../img/imdbSprite.png');
