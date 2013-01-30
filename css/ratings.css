@@ -1,0 +1,38 @@
+/*imdb-style*/
+.star-box-giga-star {
+  background-position: -180px -71px;
+  width: 66px;
+  height: 66px;
+  line-height: 66px;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 15px;
+  font-weight: bold;
+  color: black;
+  font-family: tahoma;
+}
+.imdb-icon {
+  background-image: url('../img/imdbSprite.png');
+  display: inline-block;
+  vertical-align: middle;
+}
+/*tomato-style*/
+.tomato-icon {
+  display: inline-block;
+  vertical-align: text-bottom;
+  background: transparent url('../img/tomatoSprite.png') no-repeat -312px -160px;
+}
+.med.rotten {
+  background-position: -96px -129px;
+}
+.med.fresh {
+  background-position: -64px -129px;
+}
+.tomato-icon.med {
+  width: 32px;
+  height: 32px;
+}
+.tomato-score {
+  vertical-align: 9;
+}

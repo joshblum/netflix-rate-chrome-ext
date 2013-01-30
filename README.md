@@ -1,4 +1,4 @@
 netflix-rate-ext
 ================
 
-Chrome extension that puts the IMDB and rotten tomato ratings for a given movie
+Chrome extension that adds IMDB and Rotten Tomato ratings to the Netflix webpage.
