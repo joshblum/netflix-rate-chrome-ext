@@ -16,7 +16,6 @@
         ],
     "permissions": [
         "http://www.omdbapi.com/.*",
-        "http://api.rottentomatoes.com/api/public/v1.0/.*",
         "http://movies.netflix.com/*",
         "tabs"
     ],
