@@ -7,8 +7,8 @@ Available for download on the Chrome web store <a href="https://chrome.google.co
 
 ## Screenshots:
 
-![alt text](img/screenshot-fresh.png "Screen fresh")
-![alt text](img/screenshot-rotten.png "Screen rotten")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshot-fresh.png "Screen fresh")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshot-rotten.png "Screen rotten")
 
 ## Author
 
