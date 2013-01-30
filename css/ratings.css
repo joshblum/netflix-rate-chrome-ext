@@ -16,6 +16,7 @@
   background-image: url('../img/imdbSprite.png');
   display: inline-block;
   vertical-align: middle;
+  margin-bottom: 15px;
 }
 /*tomato-style*/
 .tomato-icon {
@@ -34,5 +35,9 @@
   height: 32px;
 }
 .tomato-score {
-  vertical-align: 9;
+  vertical-align: 7px;
+  padding-left: 5px;
+}
+.tomato-wrapper {
+  padding-left: 5px;
 }

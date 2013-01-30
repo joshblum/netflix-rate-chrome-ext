@@ -11,8 +11,7 @@
     "content_scripts": [
             {
               "matches": ["http://movies.netflix.com/*"],
-              "js": ["libs/jquery-1.8.2.js", "js/ratings.js"],
-              "css": ["css/ratings.css"]
+              "js": ["libs/jquery-1.8.2.js", "js/ratings.js"]
             }
         ],
     "permissions": [
@@ -20,5 +19,10 @@
         "http://api.rottentomatoes.com/api/public/v1.0/.*",
         "http://movies.netflix.com/*",
         "tabs"
+    ],
+    "web_accessible_resources": [
+        "css/ratings.css",
+        "img/imdbSprite.png",
+        "img/tomatoSprite.png"
     ]
 }
