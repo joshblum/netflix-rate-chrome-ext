@@ -1,5 +1,5 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name" : "Netflix Rate",
     "version" : "1.0",
     "description" : "Add IMDB and Rotten Tomato ratings to the Netflix webpage.",
