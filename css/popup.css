@@ -1,9 +1,14 @@
 body {
-    padding-top: 0px;
     padding-bottom:15px;
     width:280px;
 }
 
 .top-pad {
     margin-top: 25px;
+    margin-bottom: 0px !important;
+}
+
+.icon {
+    width: 16px;
+    height: 16px;
 }

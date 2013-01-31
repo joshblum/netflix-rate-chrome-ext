@@ -11,7 +11,8 @@
   font-weight: bold;
   color: black;
   font-family: tahoma;
-  margin-left: 8px;
+  margin-left: 9px;
+  margin-top: 5px;
 }
 .imdb-icon {
   background-image: url('../img/imdbSprite.png');
@@ -19,6 +20,7 @@
   vertical-align: middle;
   margin-bottom: 15px;
 }
+
 /*tomato-style*/
 .tomato-icon {
   display: inline-block;
@@ -37,8 +39,13 @@
 }
 .tomato-score {
   vertical-align: 7px;
-  padding-left: 5px;
+  padding-left: 7px;
 }
 .tomato-wrapper {
-  padding-left: 5px;
+  padding-left:11px;
+}
+
+/*netflix-style*/
+.label {
+    margin-bottom: 15px !important;
 }

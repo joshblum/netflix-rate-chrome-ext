@@ -1,0 +1,1 @@
+chrome.tabs.create({url: document.getElementById('netflix').href});
