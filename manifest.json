@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name" : "Netflix Rate",
-    "version" : "1.1",
+    "version" : "1.2",
     "description" : "Add IMDB and Rotten Tomato ratings to the Netflix webpage.",
     "browser_action" : {
         "default_icon" : "img/logo.png",

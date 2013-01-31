@@ -108,7 +108,7 @@ function getIMDBHtml(score) {
 	if (score === null) {
 		html.css('visibility', 'hidden');
 	} else {
-		html.append(score);
+		html.append(score.toFixed(1));
 	}
 	return html
 }
