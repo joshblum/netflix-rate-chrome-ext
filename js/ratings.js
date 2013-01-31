@@ -11,9 +11,16 @@ var HOVER_SEL = {
 		'.bobbable .popLink' : getMainTitle, //main display movies
 		'.mdpLink' : getSideTitle, //small side movies
 	};
-var POPUP_INS_SEL = ".midBob";
-var POPUP_SEL = ".bobMovieRatings";
+
 var CACHE = {};
+
+function selectObj(selector, insertFunc, interval){
+	return {
+		'selector' : selector,
+		'insertFunc' : insertFunc,
+		'interval' : interval,
+		}
+}
 
 /*
 	Add the style sheet to the main netflix page.
@@ -51,10 +58,16 @@ function getSideTitle(e) {
 }
 
 function eventHandler(e){
-	var url = $(e.target).context.href;
 	var title = e.data(e) //title parse funtion
 	getRating(title, function(rating){
-		showRating(rating);
+		var url = document.location.href;
+		var args = POPUP_INS_SEL.WiHome;
+
+		if (url.indexOf('Queue') != -1) {
+			args = POPUP_INS_SEL.Queue;
+		}
+		console.log(args)
+		showRating(rating, args);
 	});
 }
 
@@ -86,21 +99,23 @@ function getRating(title, callback) {
 	})
 }
 
-function showRating(rating) {
+function showRating(rating, args) {
 	var tomato = getTomatoHtml(rating.tomato);
 	var imdb = getIMDBHtml(rating.imdb);
 	var checkVisible = setInterval(function(){
-		var $target = $(POPUP_INS_SEL);
-		if($target.length){	
+		var $target = $(args.selector);
+		if($target.length){
+			console.log('here')
 		    clearInterval(checkVisible);
 		    $('.tomato').remove();
 			$('.imdb').remove();
 			$('.ratingPredictor').remove();
-			$('.label').contents().remove()
-			$target.append(imdb);
-			$target.append(tomato);
+			$('.label').contents().remove();
+			$target[args.insertFunc](imdb);
+			$target[args.insertFunc](tomato);
+			console.log(tomato)
 		}
-	}, 650);
+	}, args.interval);
 }
 
 function getIMDBHtml(score) {
@@ -134,9 +149,13 @@ function getTomatoHtml(score) {
 }
 
 $(document).ready(function() {
+	POPUP_INS_SEL = {
+		'WiHome': selectObj('.midBob', 'append', 650), // main page selector
+		'Queue' : selectObj('.info', 'before', 800), // queue page selector
+	};
+
 	addStyle();
 	$.each(HOVER_SEL, function(selector, parser){
-
 		$(document).on('mouseenter', selector, parser, eventHandler);
 	});
 });
