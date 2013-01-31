@@ -104,7 +104,7 @@ function showRating(rating) {
 }
 
 function getIMDBHtml(score) {
-	var html = $('<div class="imdb imdb-icon star-box-giga-star">');
+	var html = $('<div class="imdb imdb-icon star-box-giga-star"></div>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
 	} else {
@@ -117,7 +117,7 @@ function getTomatoHtml(score) {
 	var html = $('<span class="tomato tomato-wrapper">' +
 		    	'<span class="tomato-icon med"></span>' +
 		        '<span class="tomato-score"></span>' +
-        	'<span>');
+        	'</span>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
 		return html
