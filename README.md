@@ -7,8 +7,10 @@ Available for download on the Chrome web store <a href="https://chrome.google.co
 
 ## Screenshots:
 
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshot-fresh.png "Screen fresh")
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshot-rotten.png "Screen rotten")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/main-fresh.png "main fresh")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/main-rotten.png "main rotten")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/queue-fresh.png "queue fresh")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/queue-rotten.png "queue rotten")
 
 ## Author
 
