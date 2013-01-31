@@ -66,7 +66,6 @@ function eventHandler(e){
 		if (url.indexOf('Queue') != -1) {
 			args = POPUP_INS_SEL.Queue;
 		}
-		console.log(args)
 		showRating(rating, args);
 	});
 }
@@ -105,7 +104,6 @@ function showRating(rating, args) {
 	var checkVisible = setInterval(function(){
 		var $target = $(args.selector);
 		if($target.length){
-			console.log('here')
 		    clearInterval(checkVisible);
 		    $('.tomato').remove();
 			$('.imdb').remove();
@@ -113,7 +111,6 @@ function showRating(rating, args) {
 			$('.label').contents().remove();
 			$target[args.insertFunc](imdb);
 			$target[args.insertFunc](tomato);
-			console.log(tomato)
 		}
 	}, args.interval);
 }
