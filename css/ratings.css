@@ -39,7 +39,6 @@
 }
 .tomato-score {
   vertical-align: 7px;
-  padding-left: 7px;
 }
 .tomato-wrapper {
   padding-left:11px;
@@ -48,4 +47,9 @@
 /*netflix-style*/
 .label {
     margin-bottom: 15px !important;
+}
+
+.rating-link {
+  text-decoration:none !important;
+  color:black !important;
 }

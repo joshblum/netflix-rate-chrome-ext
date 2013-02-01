@@ -7,6 +7,8 @@
 // callback	 name (optional)	 JSONP callback name
 // tomatoes	 true (optional)	 adds rotten tomatoes data
 var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true&t=";
+var TOMATO_LINK = "http://www.rottentomatoes.com/m/";
+var IMDB_LINK = "http://www.imdb.com/title/";
 var HOVER_SEL = {
 		'.bobbable .popLink' : getMainTitle, //main display movies
 		'.mdpLink' : getSideTitle, //small side movies
@@ -34,6 +36,17 @@ function addStyle() {
 
 function getIMDBAPI(title) {
 	return IMDB_API + title
+}
+
+function getIMDBLink(title) {
+	return IMDB_LINK + title
+}
+
+function getTomatoLink(title) {
+	var regex = /[^\w ]+/g;
+	title = title.replace(regex, '');
+	title = title.split(' ').join('_')
+	return TOMATO_LINK + title
 }
 
 /*
@@ -70,10 +83,12 @@ function eventHandler(e){
 	});
 }
 
-function addCache(title, imdb, tomato) {
+function addCache(title, imdb, tomato, id) {
 	var rating = {
 		'imdb' : imdb,
 		'tomato' : tomato,
+		'imdbID' : id,
+		'title' : title,
 	}
 
 	CACHE[title] = rating;
@@ -88,25 +103,24 @@ function getRating(title, callback) {
 	$.get(getIMDBAPI(title), function(res){
 		res = JSON.parse(res)
 		if (res.Response === 'False'){
-			addCache(title, null, null);
+			addCache(title, null, null, null);
 			return null
 		}
-		var IMDBscore = parseFloat(res.imdbRating);
+		var imdbScore = parseFloat(res.imdbRating);
 		var tomatoScore = res.tomatoUserMeter === "N/A" ? null : parseInt(res.tomatoUserMeter);
-		var rating = addCache(title, IMDBscore, tomatoScore);
+		var rating = addCache(title, imdbScore, tomatoScore, res.imdbID);
 		callback(rating);
 	})
 }
 
 function showRating(rating, args) {
-	var tomato = getTomatoHtml(rating.tomato);
-	var imdb = getIMDBHtml(rating.imdb);
+	var tomato = getTomatoHtml(rating.tomato, rating.title);
+	var imdb = getIMDBHtml(rating.imdb, rating.imdbID);
 	var checkVisible = setInterval(function(){
 		var $target = $(args.selector);
 		if($target.length){
 		    clearInterval(checkVisible);
-		    $('.tomato').remove();
-			$('.imdb').remove();
+		    $('.rating-link').remove();
 			$('.ratingPredictor').remove();
 			$('.label').contents().remove();
 			$target[args.insertFunc](imdb);
@@ -115,21 +129,19 @@ function showRating(rating, args) {
 	}, args.interval);
 }
 
-function getIMDBHtml(score) {
-	var html = $('<div class="imdb imdb-icon star-box-giga-star"></div>');
+function getIMDBHtml(score, imdbID) {
+	var html = $('<a class="rating-link" target="_blank" href="' + getIMDBLink(imdbID) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
 	} else {
-		html.append(score.toFixed(1));
+		html.find('.imdb').append(score.toFixed(1));
 	}
+
 	return html
 }
 
-function getTomatoHtml(score) {
-	var html = $('<span class="tomato tomato-wrapper">' +
-		    	'<span class="tomato-icon med"></span>' +
-		        '<span class="tomato-score"></span>' +
-        	'</span>');
+function getTomatoHtml(score, title) {
+	var html = $('<a class="rating-link" target="_blank" href="' + getTomatoLink(title) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="tomato-icon med"></span><span class="tomato-score"></span></span></a>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
 		return html
@@ -147,7 +159,7 @@ function getTomatoHtml(score) {
 
 $(document).ready(function() {
 	POPUP_INS_SEL = {
-		'WiHome': selectObj('.midBob', 'append', 650), // main page selector
+		'WiHome': selectObj('.midBob', 'append', 700), // main page selector
 		'Queue' : selectObj('.info', 'before', 800), // queue page selector
 	};
 
