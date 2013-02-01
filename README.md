@@ -15,5 +15,5 @@ Available for download on the Chrome web store <a href="https://chrome.google.co
 ## Author
 
 **Josh Blum**
-+ joshblum@mit.edu
++ [joshblum@mit.edu](mailto:joshblum@mit.edu)
 + [@blumua](https://twitter.com/blumua)
