@@ -7,7 +7,7 @@
 // callback	 name (optional)	 JSONP callback name
 // tomatoes	 true (optional)	 adds rotten tomatoes data
 var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true&t=";
-var TOMATO_LINK = "http://www.rottentomatoes.com/m/";
+var TOMATO_LINK = "http://www.rottentomatoes.com/search/?sitesearch=rt&search=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 var HOVER_SEL = {
 		'.bobbable .popLink' : getMainTitle, //main display movies
@@ -43,9 +43,6 @@ function getIMDBLink(title) {
 }
 
 function getTomatoLink(title) {
-	var regex = /[^\w ]+/g;
-	title = title.replace(regex, '');
-	title = title.split(' ').join('_')
 	return TOMATO_LINK + title
 }
 
@@ -55,6 +52,17 @@ function getTomatoLink(title) {
 function getMainTitle(e) {
 	var url = $(e.target).context.href;
 	var title = url.split('&t=')[1];
+	title = decodeURIComponent(title).replace(/\+/g, ' ');
+	return title
+}
+
+function getMainTitle(e) {
+	var $target = $(e.target);
+	var url = $target.context.href;
+	var title = url.split('&t=')[1];
+	if ($target.parents('.recentlyWatched').length) { //recently watched
+		title = title.slice(0, title.indexOf('%3A'))
+	}
 	title = decodeURIComponent(title).replace(/\+/g, ' ');
 	return title
 }
@@ -72,15 +80,17 @@ function getSideTitle(e) {
 
 function eventHandler(e){
 	var title = e.data(e) //title parse funtion
-	getRating(title, function(rating){
-		var url = document.location.href;
-		var args = POPUP_INS_SEL.WiHome;
+	if ($('.label').contents() != '') { //the popup isn't already up
+		getRating(title, function(rating){
+			var url = document.location.href;
+			var args = POPUP_INS_SEL.WiHome;
 
-		if (url.indexOf('Queue') != -1) {
-			args = POPUP_INS_SEL.Queue;
-		}
-		showRating(rating, args);
-	});
+			if (url.indexOf('Queue') != -1) {
+				args = POPUP_INS_SEL.Queue;
+			}
+			showRating(rating, args);
+		});
+	}
 }
 
 function addCache(title, imdb, tomato, id) {
@@ -107,7 +117,7 @@ function getRating(title, callback) {
 			return null
 		}
 		var imdbScore = parseFloat(res.imdbRating);
-		var tomatoScore = res.tomatoUserMeter === "N/A" ? null : parseInt(res.tomatoUserMeter);
+		var tomatoScore = res.tomatoMeter === "N/A" ? null : parseInt(res.tomatoMeter);
 		var rating = addCache(title, imdbScore, tomatoScore, res.imdbID);
 		callback(rating);
 	})
