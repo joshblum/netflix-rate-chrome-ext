@@ -11,6 +11,8 @@ Available for download on the Chrome web store <a href="https://chrome.google.co
 ![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/main-rotten.png "main rotten")
 ![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/queue-fresh.png "queue fresh")
 ![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/queue-rotten.png "queue rotten")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/dvd-fresh.png "dvd fresh")
+![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/dvd-rotten.png "dvd rotten")
 
 ## Author
 

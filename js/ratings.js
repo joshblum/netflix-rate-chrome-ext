@@ -50,16 +50,19 @@ function addStyle() {
 function getArgs() {
 	var url = document.location.href;
 	var key = 'dvd.netflix.com';
-
-	if (url.indexOf(key) === -1) { // we are in movies now
-		key = 'movies.netflix.com';
+	if (url.indexOf(key) != -1) { // we are in dvds
+		args = POPUP_INS_SEL[key];
+		args.key = key;
+		return args
 	}
+
+	key = 'movies.netflix.com';
 	var dict = POPUP_INS_SEL[key];
-	var args;
 	for (var key in dict) {
 		if (url.indexOf(key) != -1) {
 			args = dict[key];
 			args.key = key;
+			break
 		}
 	}
 
@@ -248,16 +251,13 @@ function getTomatoHtml(score, title, klass) {
 
 ///////// INIT /////////////
 $(document).ready(function() {
-	var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup')
+	var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup');
 	POPUP_INS_SEL = {
 		'movies.netflix.com' : {
 			'WiHome': selectObj('.midBob', 'append', 700), // main page selector
 			'Queue' : selectObj('.info', 'before', 800), // queue page selector
 		},
-		'dvd.netflix.com' : {
-			'MemberHome' : dvdSelObj, // dvdqueue page selector
-			'AltGenre' : dvdSelObj,
-		},
+		'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
 		'null' : selectObj('', '', 0),
 	};
 
