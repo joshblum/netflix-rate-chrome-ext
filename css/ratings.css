@@ -11,8 +11,6 @@
   font-weight: bold;
   color: black;
   font-family: tahoma;
-  margin-left: 9px;
-  margin-top: 5px;
 }
 
 .imdb-icon {
@@ -20,6 +18,8 @@
   display: inline-block;
   vertical-align: middle;
   margin-bottom: 15px;
+  margin-left: 9px;
+  margin-top: 5px;
 }
 
 /*tomato-style*/
@@ -66,4 +66,10 @@
   margin-bottom: -15px;
   margin-top: -29px;
   margin-left: 74px;
+}
+
+.search-page {
+  margin-bottom: 5px;
+  margin-top: -6px;
+  margin-left: 0px;
 }
