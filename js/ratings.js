@@ -10,17 +10,26 @@ var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true&t=";
 var TOMATO_LINK = "http://www.rottentomatoes.com/search/?sitesearch=rt&search=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 var HOVER_SEL = {
-		'.bobbable .popLink' : getMainTitle, //main display movies
-		'.mdpLink' : getSideTitle, //small side movies
+		'.bobbable .popLink' : getWIMainTitle, //wi main display movies
+		'.mdpLink' : getSideOrDVDTitle,
 	};
 
 var CACHE = {};
 
-function selectObj(selector, insertFunc, interval){
+
+/////////// HELPERS /////////////
+/*
+	Builds a select object where the selector is used to insert the ratings via the given insertFunc
+*/
+function selectObj(selector, insertFunc, interval, imdbClass, rtClass){
+	imdbClass = imdbClass || '';
+	rtClass = rtClass || '';
 	return {
 		'selector' : selector,
 		'insertFunc' : insertFunc,
 		'interval' : interval,
+		'imdbClass' : imdbClass,
+		'rtClass' : rtClass,
 		}
 }
 
@@ -34,65 +43,36 @@ function addStyle() {
 	}
 }
 
-function getIMDBAPI(title) {
-	return IMDB_API + title
-}
 
-function getIMDBLink(title) {
-	return IMDB_LINK + title
-}
+/*
+	Get the arguments for showRating based on which popup is being overridden
+*/
+function getArgs() {
+	var url = document.location.href;
+	var key = 'dvd.netflix.com';
 
-function getTomatoLink(title) {
-	return TOMATO_LINK + title
+	if (url.indexOf(key) === -1) { // we are in movies now
+		key = 'movies.netflix.com';
+	}
+	var dict = POPUP_INS_SEL[key];
+	var args;
+	for (var key in dict) {
+		if (url.indexOf(key) != -1) {
+			args = dict[key];
+			args.key = key;
+		}
+	}
+
+	if (args === undefined) {
+		args = POPUP_INS_SEL['null']
+	}
+
+	return args
 }
 
 /*
-	parses form: http://movies.netflix.com/WiPlayer?movieid=70171942&trkid=7103274&t=Archer
+	Add item to the cache
 */
-function getMainTitle(e) {
-	var url = $(e.target).context.href;
-	var title = url.split('&t=')[1];
-	title = decodeURIComponent(title).replace(/\+/g, ' ');
-	return title
-}
-
-function getMainTitle(e) {
-	var $target = $(e.target);
-	var url = $target.context.href;
-	var title = url.split('&t=')[1];
-	if ($target.parents('.recentlyWatched').length) { //recently watched
-		title = title.slice(0, title.indexOf('%3A'))
-	}
-	title = decodeURIComponent(title).replace(/\+/g, ' ');
-	return title
-}
-
-function getSideTitle(e) {
-	var title = $(e.target).attr('alt');
-	if (title === undefined) {
-		var url = $(e.target).context.href;
-		url = url.split('/')
-		var title = url[url.indexOf('WiMovie') + 1]
-		title = title.replace(/_/g, ' ')
-	}
-	return title
-}
-
-function eventHandler(e){
-	var title = e.data(e) //title parse funtion
-	if ($('.label').contents() != '') { //the popup isn't already up
-		getRating(title, function(rating){
-			var url = document.location.href;
-			var args = POPUP_INS_SEL.WiHome;
-
-			if (url.indexOf('Queue') != -1) {
-				args = POPUP_INS_SEL.Queue;
-			}
-			showRating(rating, args);
-		});
-	}
-}
-
 function addCache(title, imdb, tomato, id) {
 	var rating = {
 		'imdb' : imdb,
@@ -105,6 +85,98 @@ function addCache(title, imdb, tomato, id) {
 	return rating
 }
 
+/*
+	Helper to generalize the parser for side titles and DVD titles
+*/
+function getWrappedTitle(e, key, regex) {
+	var title = $(e.target).attr('alt');
+	if (title === undefined) {
+		var url = $(e.target).context.href;
+		url = url.split('/')
+		var title = url[url.indexOf(key) + 1]
+		title = title.replace(regex, ' ')
+	}
+	return title
+}
+
+/*
+	Clear old ratings and unused content. Differs for different popups
+*/
+function clearOld(args){
+	if (args.key in POPUP_INS_SEL['movies.netflix.com']){
+		$('.label').contents().remove();
+	}
+	$('.rating-link').remove();
+	$('.ratingPredictor').remove();
+}
+
+
+///////////////// URL BUILDERS ////////////////
+function getIMDBAPI(title) {
+	return IMDB_API + title
+}
+
+function getIMDBLink(title) {
+	return IMDB_LINK + title
+}
+
+function getTomatoLink(title) {
+	return TOMATO_LINK + title
+}
+
+
+///////////////// TITLE PARSERS ////////////////
+/*
+	parses form: http://movies.netflix.com/WiPlayer?movieid=70171942&trkid=7103274&t=Archer
+*/
+function getWIMainTitle(e) {
+	var $target = $(e.target);
+	var url = $target.context.href;
+	var title = url.split('&t=')[1];
+	if ($target.parents('.recentlyWatched').length) { //recently watched
+		title = title.slice(0, title.indexOf('%3A'))
+	}
+	title = decodeURIComponent(title).replace(/\+/g, ' ');
+	return title
+}
+
+/*
+	Instant Queue and dvd popups use the same selector but different parsers
+*/
+function getSideOrDVDTitle(e) {
+	var url = document.location.href;
+	var key = 'dvd.netflix.com';
+	if (url.indexOf(key) != -1) { // we are in dvds now
+		return getDVDTitle(e)
+	} 
+	return getSideTitle(e)
+}
+
+function getSideTitle(e) {
+	var key = "WiMovie";
+	var regex = /_/g;
+	return getWrappedTitle(e, key,regex)
+}
+
+function getDVDTitle(e) {
+	var key = "Movie";
+	var regex = /-/g;
+	return getWrappedTitle(e, key,regex)
+}
+
+/////////// RATING HANDLERS ////////////
+function eventHandler(e){
+	var title = e.data(e) //title parse funtion
+	if ($('.label').contents() != '') { //the popup isn't already up
+		getRating(title, function(rating){
+			showRating(rating, getArgs());
+		});
+	}
+}
+
+/*
+	Search for the title, first in the CACHE and then through the API
+*/
 function getRating(title, callback) {
 	if (title in CACHE) {
 		callback(CACHE[title]);
@@ -123,34 +195,39 @@ function getRating(title, callback) {
 	})
 }
 
+/*
+	Given a rating and specific arguments, dispaly the rating on the page
+*/
 function showRating(rating, args) {
-	var tomato = getTomatoHtml(rating.tomato, rating.title);
-	var imdb = getIMDBHtml(rating.imdb, rating.imdbID);
+	var imdb = getIMDBHtml(rating.imdb, rating.imdbID, args.imdbClass);
+	var tomato = getTomatoHtml(rating.tomato, rating.title, args.rtClass);
+	if (!args.interval) { // unknown popup
+		return
+	}
 	var checkVisible = setInterval(function(){
 		var $target = $(args.selector);
 		if($target.length){
 		    clearInterval(checkVisible);
-		    $('.rating-link').remove();
-			$('.ratingPredictor').remove();
-			$('.label').contents().remove();
+		    clearOld(args);
 			$target[args.insertFunc](imdb);
 			$target[args.insertFunc](tomato);
 		}
 	}, args.interval);
 }
 
-function getIMDBHtml(score, imdbID) {
+
+/////////// HTML BUILDERS ////////////
+function getIMDBHtml(score, imdbID, klass) {
 	var html = $('<a class="rating-link" target="_blank" href="' + getIMDBLink(imdbID) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
 	} else {
-		html.find('.imdb').append(score.toFixed(1));
+		html.find('.imdb').addClass(klass).append(score.toFixed(1));
 	}
-
 	return html
 }
 
-function getTomatoHtml(score, title) {
+function getTomatoHtml(score, title, klass) {
 	var html = $('<a class="rating-link" target="_blank" href="' + getTomatoLink(title) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="tomato-icon med"></span><span class="tomato-score"></span></span></a>');
 	if (score === null) {
 		html.css('visibility', 'hidden');
@@ -164,16 +241,28 @@ function getTomatoHtml(score, title) {
 	}
 	html.find('.tomato-icon').addClass(klass);
 	html.find('.tomato-score').append(score + '%');
+	html.addClass(klass); //add custome class
 	return html
 }
 
+
+///////// INIT /////////////
 $(document).ready(function() {
+	var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup')
 	POPUP_INS_SEL = {
-		'WiHome': selectObj('.midBob', 'append', 700), // main page selector
-		'Queue' : selectObj('.info', 'before', 800), // queue page selector
+		'movies.netflix.com' : {
+			'WiHome': selectObj('.midBob', 'append', 700), // main page selector
+			'Queue' : selectObj('.info', 'before', 800), // queue page selector
+		},
+		'dvd.netflix.com' : {
+			'MemberHome' : dvdSelObj, // dvdqueue page selector
+			'AltGenre' : dvdSelObj,
+		},
+		'null' : selectObj('', '', 0),
 	};
 
 	addStyle();
+
 	$.each(HOVER_SEL, function(selector, parser){
 		$(document).on('mouseenter', selector, parser, eventHandler);
 	});
