@@ -14,6 +14,7 @@
   margin-left: 9px;
   margin-top: 5px;
 }
+
 .imdb-icon {
   background-image: url('../img/imdbSprite.png');
   display: inline-block;
@@ -27,19 +28,24 @@
   vertical-align: text-bottom;
   background: transparent url('../img/tomatoSprite.png') no-repeat -312px -160px;
 }
+
 .med.rotten {
   background-position: -96px -129px;
 }
+
 .med.fresh {
   background-position: -64px -129px;
 }
+
 .tomato-icon.med {
   width: 32px;
   height: 32px;
 }
+
 .tomato-score {
   vertical-align: 7px;
 }
+
 .tomato-wrapper {
   padding-left:11px;
 }
@@ -52,6 +58,8 @@
 .rating-link {
   text-decoration:none !important;
   color:black !important;
+  padding:5px;
+  padding-left: 0px;
 }
 
 .dvd-popup {
