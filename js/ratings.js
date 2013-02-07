@@ -16,7 +16,8 @@ var HOVER_SEL = {
         '.mdpLink' : getSideOrDVDTitle,
     };
 
-var CACHE = {};
+var CACHE = localStorage;
+var CACHE_LIFE = 2629740000 //one month in milliseconds
 
 
 /////////// HELPERS /////////////
@@ -84,16 +85,42 @@ function addCache(title, imdb, tomato, imdbID, year) {
     imdb = imdb || null;
     tomato = tomato || null;
     imdbID = imdbID || null;
+
+    var date = new Date().getTime();
     var rating = {
         'title' : title,
         'imdb' : imdb,
         'tomato' : tomato,
         'imdbID' : imdbID,
         'year' : year,
+        'date' : date,
+    }
+    
+    CACHE[title] = JSON.stringify(rating);
+    return rating
+}
+
+function checkCache(title) {
+    if(!(title in CACHE)) {
+        return {
+            'inCache' : false,
+            'cachedVal' : null
+        }
     }
 
-    CACHE[title] = rating;
-    return rating
+    var cachedVal = JSON.parse(CACHE[title])
+    var inCache = false;
+    if (cachedVal !== undefined && cachedVal.year !== null){
+        var now = new Date().getTime();
+        var lifetime = now - cachedVal.date;
+        if(lifetime <= CACHE_LIFE) {
+            inCache = true;
+        }
+    }
+    return {
+        'inCache' : inCache,
+        'cachedVal' : cachedVal
+    }
 }
 
 /*
@@ -220,8 +247,9 @@ function eventHandler(e){
     Search for the title, first in the CACHE and then through the API
 */
 function getRating(title, year, addArgs, callback) {
-    if (title in CACHE && CACHE[title].year !== null) {
-        callback(CACHE[title], addArgs);
+    var cached = checkCache(title);
+    if (cached.inCache){
+        callback(cached.cachedVal, addArgs);
         return
     }
     $.get(getIMDBAPI(title, year), function(res){
@@ -234,14 +262,13 @@ function getRating(title, year, addArgs, callback) {
         var tomatoScore = res.tomatoMeter === "N/A" ? null : parseInt(res.tomatoMeter);
         var rating = addCache(title, imdbScore, tomatoScore, res.imdbID, year);
         callback(rating, addArgs);
-    })
+    });
 }
 
 /*
     Given a rating and specific arguments, display to popup or search page
 */
 function showRating(rating, args) {
-
     if (!args.interval) { // unknown popup
         return
     }
@@ -257,10 +284,11 @@ function showRating(rating, args) {
 }
 
 /*
-    Call the API with the year and update the rating if necssary
+    Call the API with the year and update the rating if neccessary
 */
 function updateCache(title) {
-    if (CACHE[title].year === null) {
+    var cachedVal = checkCache(title).cachedVal
+    if (cachedVal.year === null) {
         var year = parseYear();
         getRating(title, year, null, function(rating){
             showRating(rating, getArgs());
@@ -312,9 +340,7 @@ function displaySearch(args){
             'target' : $target,
             'selector' : args.selector
         }; // add the current target so the rating matches the movie found
-        console.log(index)
         getRating(title, year, addArgs, function(rating, addArgs){
-            console.log(index)
             args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
             displayRating(rating, args);
         });
