@@ -62,16 +62,12 @@ function getArgs() {
 
     key = 'movies.netflix.com';
     var dict = POPUP_INS_SEL[key];
-    for (var key in dict) {
-        if (url.indexOf(key) != -1) {
-            args = dict[key];
-            args.key = key;
-            break
-        }
-    }
-
-    if (args === undefined) {
-        args = POPUP_INS_SEL['null']
+    if (url.indexOf('Queue') != -1) {
+        args = dict.Queue;
+        args.key = 'Queue';
+    } else {
+        args = dict.Wi;
+        args.key = 'Wi';
     }
 
     return args
@@ -386,12 +382,10 @@ $(document).ready(function() {
     //poup select types
     POPUP_INS_SEL = {
         'movies.netflix.com' : {
-            'WiHome': WiObj, // main page selector
-            'WiSearch' :  WiObj,
+            'Wi': WiObj, // main page selector
             'Queue' : selectObj('.info', 'before', 800), // queue page selector
         },
         'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
-        'null' : selectObj('', '', 0),
     };
 
     //search select types
