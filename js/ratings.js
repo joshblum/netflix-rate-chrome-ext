@@ -9,6 +9,8 @@
 var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true";
 var TOMATO_LINK = "http://www.rottentomatoes.com/search/?sitesearch=rt&search=";
 var IMDB_LINK = "http://www.imdb.com/title/";
+
+//popup movie selectors
 var HOVER_SEL = {
         '.bobbable .popLink' : getWIMainTitle, //wi main display movies
         '.mdpLink' : getSideOrDVDTitle,
@@ -19,7 +21,7 @@ var CACHE = {};
 
 /////////// HELPERS /////////////
 /*
-    Builds a select object where the selector is used to insert the ratings via the given insertFunc
+    Builds a select object where the selector is used to insert the ratings via the given insertFunc. Interval specifies the interval necessary for the popupDelay. imdb and rt classes are extra classes that can be added to a rating.
 */
 function selectObj(selector, insertFunc, interval, imdbClass, rtClass){
     imdbClass = imdbClass || '';
@@ -112,14 +114,20 @@ function getWrappedTitle(e, key, regex) {
     Clear old ratings and unused content. Differs for different popups
 */
 function clearOld(args){
+    var $target = $('#BobMovie');
     if (args.key in POPUP_INS_SEL['movies.netflix.com']){
-        $('.label').contents().remove();
+        $target.find('.label').contents().remove();
     }
-    $('.rating-link').remove();
-    $('.ratingPredictor').remove();
+    $target.find('.rating-link').remove();
+    $target.find('.ratingPredictor').remove();
 }
 
+
 ///////////////// URL BUILDERS ////////////////
+
+/*
+    Builds and returns the imdbAPI url
+*/
 function getIMDBAPI(title, year) {
     var url = IMDB_API + '&t=' + title
     if (year !== null) {
@@ -128,10 +136,16 @@ function getIMDBAPI(title, year) {
     return url
 }
 
+/*
+    Build the url for the imdbLink
+*/
 function getIMDBLink(title) {
     return IMDB_LINK + title
 }
 
+/*
+    Build the url for the rtLink
+*/
 function getTomatoLink(title) {
     return TOMATO_LINK + title
 }
@@ -196,7 +210,7 @@ function parseSearchTitle($target){
 function eventHandler(e){
     var title = e.data(e) //title parse funtion
     if ($('.label').contents() != '') { //the popup isn't already up
-        getRating(title, null, null, function(rating){ //null year, null args
+        getRating(title, null, null, function(rating){ //null year, null addArgs
             showRating(rating, getArgs());
         });
     }
@@ -205,9 +219,9 @@ function eventHandler(e){
 /*
     Search for the title, first in the CACHE and then through the API
 */
-function getRating(title, year, args, callback) {
+function getRating(title, year, addArgs, callback) {
     if (title in CACHE && CACHE[title].year !== null) {
-        callback(CACHE[title], args);
+        callback(CACHE[title], addArgs);
         return
     }
     $.get(getIMDBAPI(title, year), function(res){
@@ -219,7 +233,7 @@ function getRating(title, year, args, callback) {
         var imdbScore = parseFloat(res.imdbRating);
         var tomatoScore = res.tomatoMeter === "N/A" ? null : parseInt(res.tomatoMeter);
         var rating = addCache(title, imdbScore, tomatoScore, res.imdbID, year);
-        callback(rating, args);
+        callback(rating, addArgs);
     })
 }
 
@@ -230,35 +244,35 @@ function showRating(rating, args) {
 
     if (!args.interval) { // unknown popup
         return
-    } else if (args.interval === -1) {//search page objects
-        displayRating(rating, args);
     }
     var checkVisible = setInterval(function(){
         var $target = $(args.selector);
         if($target.length){
             clearInterval(checkVisible);
             updateCache(rating.title); //run the query with the year to update
+            clearOld(args);
             displayRating(rating, args);
         }
     }, args.interval);
 }
 
+/*
+    Call the API with the year and update the rating if necssary
+*/
 function updateCache(title) {
     if (CACHE[title].year === null) {
         var year = parseYear();
-        getRating(title, year, getArgs(), function(rating, args){
-            showRating(rating, args);
+        getRating(title, year, null, function(rating){
+            showRating(rating, getArgs());
         });
     }
 }
 
 /*
-    Build and display the rating
+    Build and display the ratings
 */
 function displayRating(rating, args) {
-    clearOld(args);
-
-    var imdb = getIMDBHtml(rating.imdb, rating.imdbID, args.imdbClass);
+    var imdb = getIMDBHtml(rating.imdb, rating.imdbID, rating.title, args.imdbClass);
     var tomato = getTomatoHtml(rating.tomato, rating.title, args.rtClass);
     var $target = $(args.selector);
     $target[args.insertFunc](imdb);
@@ -266,8 +280,50 @@ function displayRating(rating, args) {
 }
 
 
+////////SEARCH AND INDIVIDUAL PAGE HANDLERS //////////
+/*
+    Determine which search, dvd or watch instantly and display the correct ratings
+*/
+function searchSetup() {
+    var url = document.location.href;
+    var args;
+    if (url.indexOf("WiSearch") !== -1) {
+        args = SEARCH_SEL.WiSearch;
+        args.selectorClass = ".media"
+    } else if (url.indexOf("Search") !== -1) {
+        args = SEARCH_SEL.Search;
+        args.selectorClass = ".agMovie";
+    }
+    if (args === undefined) {
+        return
+    }
+    return displaySearch(args)
+}
+
+/*
+    Find ratings for all of the movies found by the search and display them
+*/
+function displaySearch(args){
+    $.each($(args.selectorClass), function(index, target){ // iterate over movies found
+        var $target = $(target);
+        var year = parseYear($target.find('.year'));
+        var title = parseSearchTitle($target);
+        var addArgs = {
+            'target' : $target,
+            'selector' : args.selector
+        }; // add the current target so the rating matches the movie found
+        console.log(index)
+        getRating(title, year, addArgs, function(rating, addArgs){
+            console.log(index)
+            args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
+            displayRating(rating, args);
+        });
+    });
+}
+
+
 /////////// HTML BUILDERS ////////////
-function getIMDBHtml(score, imdbID, klass) {
+function getIMDBHtml(score, imdbID, title, klass) {
     var html = $('<a class="rating-link" target="_blank" href="' + getIMDBLink(imdbID) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
     if (score === null) {
         html.css('visibility', 'hidden');
@@ -295,40 +351,13 @@ function getTomatoHtml(score, title, klass) {
     return html
 }
 
-
-////////SEARCH AND INDIVIDUAL PAGE HANDLERS //////////
-function searchSetup() {
-    var url = document.location.href;
-    var args;
-    if (url.indexOf("WiSearch") !== -1) {
-        args = SEARCH_SEL.WiSearch;
-    } else if (url.indexOf("Search") !== -1) {
-        args = SEARCH_SEL.Search;
-    }
-    if (args === undefined) {
-        return
-    }
-    return displaySearch(args)
-}
-
-function displaySearch(args){
-    $.each($('.agMovie'), function(index, target){
-        var $target = $(target);
-        var year = parseYear($target.find('.year'));
-        var title = parseSearchTitle($target);
-        args.selector = $target; // store selector to show rating on.
-        getRating(title, year, args, function(rating){
-            console.log(index, year, title, args)
-            showRating(rating, args);
-        });
-    });
-}
-
-
 ///////// INIT /////////////
 $(document).ready(function() {
+    //common select objects
     var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup');
-    var WiObj = selectObj('.midBob', 'append', 700);    
+    var WiObj = selectObj('.midBob', 'append', 700);
+
+    //poup select types
     POPUP_INS_SEL = {
         'movies.netflix.com' : {
             'WiHome': WiObj, // main page selector
@@ -338,16 +367,18 @@ $(document).ready(function() {
         'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
         'null' : selectObj('', '', 0),
     };
+
+    //search select types
     SEARCH_SEL = {
         //search page selectors
-        'Search' : selectObj('.bluray', 'append', -1, 'search-page'),
-        'WiSearch' : selectObj('.inr', 'append', -1, 'search-page'),
+        'Search' : selectObj('.bluray', 'append', -1, 'dvd-search-page'),
+        'WiSearch' : selectObj('.actions', 'append', -1, 'wi-search-page'),
     };
 
-    addStyle();
-    searchSetup();
+    addStyle(); //add ratings.css to the page 
+    searchSetup(); // check if this is a search page
 
-    $.each(HOVER_SEL, function(selector, parser){
+    $.each(HOVER_SEL, function(selector, parser){ //add listeners for each hover selector
         $(document).on('mouseenter', selector, parser, eventHandler);
     });
 });

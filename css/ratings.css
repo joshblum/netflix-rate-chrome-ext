@@ -68,8 +68,14 @@
   margin-left: 74px;
 }
 
-.search-page {
-  margin-bottom: 5px;
+.dvd-search-page {
+  margin-bottom: 10px;
   margin-top: -6px;
   margin-left: 0px;
+}
+
+.wi-search-page {
+  margin-bottom: -4px;
+  margin-top: -30px;
+  margin-left: 13px;
 }
