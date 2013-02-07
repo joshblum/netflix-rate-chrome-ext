@@ -194,6 +194,10 @@ function getWIMainTitle(e) {
 */
 function getSideOrDVDTitle(e) {
     var url = document.location.href;
+    if (url.indexOf('Search') != -1) { //no popups on search page.
+        return $(e.target).text() // but still cache the title
+    }
+
     var key = 'dvd.netflix.com';
     if (url.indexOf(key) != -1) { // we are in dvds now
         return getDVDTitle(e)
@@ -226,6 +230,7 @@ function parseYear($target) {
     Parse the search title for a given search result
 */
 function parseSearchTitle($target){
+
     return $target.find('.title').children().text();
 }
 
@@ -249,7 +254,12 @@ function getRating(title, year, addArgs, callback) {
         return
     }
     $.get(getIMDBAPI(title, year), function(res){
-        res = JSON.parse(res)
+        try {
+          res = JSON.parse(res)
+        } catch(e){
+          res = {'Response' : 'False'}
+        }
+        
         if (res.Response === 'False'){
             addCache(title);
             return null
@@ -328,16 +338,19 @@ function searchSetup() {
     Find ratings for all of the movies found by the search and display them
 */
 function displaySearch(args){
+
+    var selector = args.selector;
     $.each($(args.selectorClass), function(index, target){ // iterate over movies found
         var $target = $(target);
         var year = parseYear($target.find('.year'));
         var title = parseSearchTitle($target);
         var addArgs = {
             'target' : $target,
-            'selector' : args.selector
+            'selector' : selector
         }; // add the current target so the rating matches the movie found
         getRating(title, year, addArgs, function(rating, addArgs){
             args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
+
             displayRating(rating, args);
         });
     });
