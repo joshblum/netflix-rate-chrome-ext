@@ -17,7 +17,7 @@ var HOVER_SEL = {
     };
 
 var CACHE = localStorage;
-var CACHE_LIFE = 2629740000 //one month in milliseconds
+var CACHE_LIFE = 1210000000 //two weeks in milliseconds
 
 
 /////////// HELPERS /////////////
@@ -126,6 +126,9 @@ function getWrappedTitle(e, key, regex) {
     var title = $(e.target).attr('alt');
     if (title === undefined) {
         var url = $(e.target).context.href;
+        if (typeof url === "undefined"){
+            return ""
+        }
         url = url.split('/')
         var title = url[url.indexOf(key) + 1]
         title = title.replace(regex, ' ')
@@ -186,9 +189,20 @@ function getWIMainTitle(e) {
     }
     var title = url.split('&t=')[1];
     if ($target.parents('.recentlyWatched').length) { //recently watched
-        title = title.slice(0, title.indexOf('%3A'))
+        title = getRecentTitle(title);
     }
     title = decodeURIComponent(title).replace(/\+/g, ' ');
+    return title
+}
+
+/*
+    Cleanup recently watched title
+*/
+function getRecentTitle(title) {
+    var index = title.indexOf('%3A');
+    if (index !== -1) {
+        title = title.slice(0, index);
+    }
     return title
 }
 
