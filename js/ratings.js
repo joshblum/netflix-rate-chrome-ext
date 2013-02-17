@@ -181,6 +181,9 @@ function getTomatoLink(title) {
 function getWIMainTitle(e) {
     var $target = $(e.target);
     var url = $target.context.href;
+    if (typeof url === "undefined"){
+        return ""
+    }
     var title = url.split('&t=')[1];
     if ($target.parents('.recentlyWatched').length) { //recently watched
         title = title.slice(0, title.indexOf('%3A'))
@@ -230,7 +233,6 @@ function parseYear($target) {
     Parse the search title for a given search result
 */
 function parseSearchTitle($target){
-
     return $target.find('.title').children().text();
 }
 
