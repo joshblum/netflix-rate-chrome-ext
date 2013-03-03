@@ -9,11 +9,10 @@ Download directly from the <a href="https://chrome.google.com/webstore/detail/ne
 
 ## Screenshots:
 
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/main-fresh.png "main fresh")
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/search-page.png "search page")
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/queue-rotten.png "queue rotten")
-![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/dvd-fresh.png "dvd fresh")
-
+![alt text](http://netflix-rate.herokuapp.com/static/img/screenshots/main-fresh.png "main fresh")
+![alt text](http://netflix-rate.herokuapp.com/static/img/screenshots/search-page.png "search page")
+![alt text](http://netflix-rate.herokuapp.com/static/img/screenshots/queue-rotten.png "queue rotten")
+![alt text](http://netflix-rate.herokuapp.com/static/img/screenshots/dvd-fresh.png "dvd fresh")
 ## Author
 
 **Josh Blum**
