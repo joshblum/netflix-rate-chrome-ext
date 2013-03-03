@@ -19,3 +19,6 @@ Download directly from the <a href="https://chrome.google.com/webstore/detail/ne
 **Josh Blum**
 + [joshblum@mit.edu](mailto:joshblum@mit.edu)
 + [@blumua](https://twitter.com/blumua)
+
+## Contributions
++ <a href="http://thenounproject.com/noun/share/#icon-No3893" target="_blank">Share</a> designed by <a href="http://thenounproject.com/planemad" target="_blank">Share Icon Project</a> from The Noun Project
