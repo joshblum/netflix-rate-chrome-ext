@@ -5,6 +5,8 @@ A Chrome extension that adds IMDB and Rotten Tomato ratings to the Netflix webpa
 
 Available for download on the Chrome web store <a href="https://chrome.google.com/webstore/detail/netflix-rate/ecaaapiecdienibfgolcopgnicppkmhn?hl=en" target="_blank">here</a>.
 
+[Share this extension](http://netflix-rate.herokuapp.com)
+
 ## Screenshots:
 
 ![alt text](https://raw.github.com/joshblum/netflix-rate-chrome-ext/master/img/screenshots/main-fresh.png "main fresh")

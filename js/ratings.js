@@ -182,17 +182,7 @@ function getTomatoLink(title) {
     parses form: http://movies.netflix.com/WiPlayer?movieid=70171942&trkid=7103274&t=Archer
 */
 function getWIMainTitle(e) {
-    var $target = $(e.target);
-    var url = $target.context.href;
-    if (typeof url === "undefined"){
-        return ""
-    }
-    var title = url.split('&t=')[1];
-    if ($target.parents('.recentlyWatched').length) { //recently watched
-        title = getRecentTitle(title);
-    }
-    title = decodeURIComponent(title).replace(/\+/g, ' ');
-    return title
+    return $(e.target).siblings('img').attr('alt');
 }
 
 /*
