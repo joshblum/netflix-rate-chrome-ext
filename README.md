@@ -7,6 +7,8 @@ Download directly from the <a href="https://chrome.google.com/webstore/detail/ne
 
 <a href="http://netflix.burtonthird.com" target="_blank">Share this extension</a>.
 
+Netflix-rate is available under the [MIT license](http://opensource.org/licenses/MIT).
+
 
 ## Screenshots:
 
