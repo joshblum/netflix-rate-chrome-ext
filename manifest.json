@@ -11,7 +11,7 @@
     "content_scripts": [
             {
               "matches": ["http://*.netflix.com/*"],
-              "js": ["libs/jquery-1.8.2.js", "js/ratings.js"]
+              "js": ["libs/jquery-2.0.3.min.js", "js/ratings.js"]
             }
         ],
     "permissions": [

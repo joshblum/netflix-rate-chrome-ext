@@ -17,7 +17,7 @@ var HOVER_SEL = {
     };
 
 var CACHE = localStorage;
-var CACHE_LIFE = 1210000000 //two weeks in milliseconds
+var CACHE_LIFE = 1000*60*60*24*7*2; //two weeks in milliseconds
 
 
 /////////// HELPERS /////////////
@@ -90,7 +90,7 @@ function addCache(title, imdb, tomato, imdbID, year) {
         'imdbID' : imdbID,
         'year' : year,
         'date' : date,
-    }
+    };
     
     CACHE[title] = JSON.stringify(rating);
     return rating
@@ -100,7 +100,7 @@ function checkCache(title) {
     if(!(title in CACHE)) {
         return {
             'inCache' : false,
-            'cachedVal' : null
+            'cachedVal' : null,
         }
     }
 
@@ -115,7 +115,7 @@ function checkCache(title) {
     }
     return {
         'inCache' : inCache,
-        'cachedVal' : cachedVal
+        'cachedVal' : cachedVal,
     }
 }
 
@@ -129,9 +129,9 @@ function getWrappedTitle(e, key, regex) {
         if (typeof url === "undefined"){
             return ""
         }
-        url = url.split('/')
-        var title = url[url.indexOf(key) + 1]
-        title = title.replace(regex, ' ')
+        url = url.split('/');
+        var title = url[url.indexOf(key) + 1];
+        title = title.replace(regex, ' ');
     }
     return title
 }
@@ -155,9 +155,9 @@ function clearOld(args){
     Builds and returns the imdbAPI url
 */
 function getIMDBAPI(title, year) {
-    var url = IMDB_API + '&t=' + title
+    var url = IMDB_API + '&t=' + title;
     if (year !== null) {
-        url += '&y=' + year
+        url += '&y=' + year;
     }
     return url
 }
@@ -228,7 +228,7 @@ function parseYear($target) {
     var $target = $target || $('.year');
     var year = null;
     if ($target.length) {
-        year = $target.text().split('-')[0]
+        year = $target.text().split('-')[0];
     }
     return year
 }
@@ -242,7 +242,7 @@ function parseSearchTitle($target){
 
 /////////// RATING HANDLERS ////////////
 function eventHandler(e){
-    var title = e.data(e) //title parse funtion
+    var title = e.data(e); //title parse funtion
     if ($('.label').contents() != '') { //the popup isn't already up
         getRating(title, null, null, function(rating){ //null year, null addArgs
             showRating(rating, getArgs());
@@ -263,7 +263,9 @@ function getRating(title, year, addArgs, callback) {
         try {
           res = JSON.parse(res)
         } catch(e){
-          res = {'Response' : 'False'}
+          res = {
+                'Response' : 'False'
+            };
         }
         
         if (res.Response === 'False'){
@@ -329,7 +331,7 @@ function searchSetup() {
     var args;
     if (url.indexOf("WiSearch") !== -1) {
         args = SEARCH_SEL.WiSearch;
-        args.selectorClass = ".media"
+        args.selectorClass = ".media";
     } else if (url.indexOf("Search") !== -1) {
         args = SEARCH_SEL.Search;
         args.selectorClass = ".agMovie";
@@ -352,7 +354,7 @@ function displaySearch(args){
         var title = parseSearchTitle($target);
         var addArgs = {
             'target' : $target,
-            'selector' : selector
+            'selector' : selector,
         }; // add the current target so the rating matches the movie found
         getRating(title, year, addArgs, function(rating, addArgs){
             args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
@@ -365,7 +367,7 @@ function displaySearch(args){
 
 /////////// HTML BUILDERS ////////////
 function getIMDBHtml(score, imdbID, title, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + getIMDBLink(imdbID) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getIMDBLink(imdbID)) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
     if (score === null) {
         html.css('visibility', 'hidden');
     } else {
@@ -375,7 +377,7 @@ function getIMDBHtml(score, imdbID, title, klass) {
 }
 
 function getTomatoHtml(score, title, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + getTomatoLink(title) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="tomato-icon med"></span><span class="tomato-score"></span></span></a>');
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(title)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="tomato-icon med"></span><span class="tomato-score"></span></span></a>');
     if (score === null) {
         html.css('visibility', 'hidden');
         return html
@@ -390,6 +392,20 @@ function getTomatoHtml(score, title, klass) {
     html.find('.tomato-score').append(score + '%');
     html.addClass(klass); //add custom class
     return html
+}
+
+/*
+    Helper function for escaping API urls
+*/
+function escapeHTML(str) {
+    return str.replace(/[&"<>]/g, function(m) {
+        return { 
+            "&": "&amp;",
+            '"': "&quot;",
+            "<": "&lt;",
+            ">": "&gt;",
+        }[m];
+    });
 }
 
 ///////// INIT /////////////
