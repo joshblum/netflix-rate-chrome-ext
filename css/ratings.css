@@ -18,31 +18,46 @@
   display: inline-block;
   vertical-align: middle;
   margin-bottom: 15px;
-  margin-left: 10px;
+  margin-left: 2px;
+  margin-right: -17px;
   margin-top: 5px;
 }
 
+.icon-pull {
+  margin-left: -10px;
+}
+
 /*tomato-style*/
-.tomato-icon {
+.rt-icon {
   display: inline-block;
   vertical-align: text-bottom;
   background: transparent url('../img/tomatoSprite.png') no-repeat -312px -160px;
 }
 
-.med.rotten {
+.tomato-icon.med.rotten {
   background-position: -96px -129px;
 }
 
-.med.fresh {
+.tomato-icon.med.fresh {
   background-position: -64px -129px;
 }
 
-.tomato-icon.med {
+.audience-icon.med.rotten {
+  background-position: -127px -129px;
+}
+
+.audience-icon.med.fresh {
+  background-position: -31px -129px;
+}
+
+.rt-icon.med {
+  margin-left:-2px;
   width: 32px;
   height: 32px;
 }
 
-.tomato-score {
+.rt-score {
+  font-size: .9em;
   vertical-align: 7px;
 }
 

@@ -19,7 +19,6 @@ var HOVER_SEL = {
 var CACHE = localStorage;
 var CACHE_LIFE = 1000*60*60*24*7*2; //two weeks in milliseconds
 
-
 /////////// HELPERS /////////////
 /*
     Builds a select object where the selector is used to insert the ratings via the given insertFunc. Interval specifies the interval necessary for the popupDelay. imdb and rt classes are extra classes that can be added to a rating.
@@ -76,17 +75,19 @@ function getArgs() {
 /*
     Add item to the cache
 */
-function addCache(title, imdb, tomato, imdbID, year) {
+function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year) {
     year = year || null;
     imdb = imdb || null;
-    tomato = tomato || null;
+    tomatoMeter = tomatoMeter || null;
+    tomatoUserMeter = tomatoUserMeter || null;
     imdbID = imdbID || null;
 
     var date = new Date().getTime();
     var rating = {
         'title' : title,
         'imdb' : imdb,
-        'tomato' : tomato,
+        'tomatoMeter' : tomatoMeter,
+        'tomatoUserMeter' : tomatoUserMeter,
         'imdbID' : imdbID,
         'year' : year,
         'date' : date,
@@ -106,7 +107,7 @@ function checkCache(title) {
 
     var cachedVal = JSON.parse(CACHE[title])
     var inCache = false;
-    if (cachedVal !== undefined && cachedVal.year !== null){
+    if (cachedVal !== undefined && cachedVal.tomato !== undefined && cachedVal.year !== null){
         var now = new Date().getTime();
         var lifetime = now - cachedVal.date;
         if(lifetime <= CACHE_LIFE) {
@@ -146,6 +147,16 @@ function clearOld(args){
     }
     $target.find('.rating-link').remove();
     $target.find('.ratingPredictor').remove();
+}
+
+function getTomatoClass(score) {
+    var klass;
+    if (score < 59) {
+        klass = 'rotten';
+    } else {
+        klass = 'fresh';
+    }
+    return klass
 }
 
 
@@ -273,10 +284,18 @@ function getRating(title, year, addArgs, callback) {
             return null
         }
         var imdbScore = parseFloat(res.imdbRating);
-        var tomatoScore = res.tomatoMeter === "N/A" ? null : parseInt(res.tomatoMeter);
-        var rating = addCache(title, imdbScore, tomatoScore, res.imdbID, year);
+        var tomatoMeter = getTomatoScore(res, "tomatoMeter");
+        var tomatoUserMeter = getTomatoScore(res, "tomatoUserMeter");
+        var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter, res.imdbID, year);
         callback(rating, addArgs);
     });
+}
+
+/*
+    parse tomato rating from api response object
+*/
+function getTomatoScore(res, meterType) {
+    return res[meterType] === "N/A" ? null : parseInt(res[meterType])
 }
 
 /*
@@ -315,7 +334,7 @@ function updateCache(title) {
 */
 function displayRating(rating, args) {
     var imdb = getIMDBHtml(rating.imdb, rating.imdbID, rating.title, args.imdbClass);
-    var tomato = getTomatoHtml(rating.tomato, rating.title, args.rtClass);
+    var tomato = getTomatoHtml(rating.tomatoMeter, rating.tomatoUserMeter, rating.title, args.rtClass);
     var $target = $(args.selector);
     $target[args.insertFunc](imdb);
     $target[args.insertFunc](tomato);
@@ -376,20 +395,19 @@ function getIMDBHtml(score, imdbID, title, klass) {
     return html
 }
 
-function getTomatoHtml(score, title, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(title)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="tomato-icon med"></span><span class="tomato-score"></span></span></a>');
-    if (score === null) {
+function getTomatoHtml(tomatoMeter, tomatoUserMeter, title, klass) {
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(title)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
+    if (tomatoMeter === null || tomatoUserMeter === null) {
         html.css('visibility', 'hidden');
         return html
     }
-    var klass;
-    if (score < 59) {
-        klass = 'rotten';
-    } else {
-        klass = 'fresh';
-    }
-    html.find('.tomato-icon').addClass(klass);
-    html.find('.tomato-score').append(score + '%');
+
+    html.find('.tomato-icon').addClass(getTomatoClass(tomatoMeter));
+    html.find('.tomato-score').append(tomatoMeter + '%');    
+
+    html.find('.audience-icon').addClass(getTomatoClass(tomatoUserMeter));
+    html.find('.audience-score').append(tomatoUserMeter + '%');
+    
     html.addClass(klass); //add custom class
     return html
 }
@@ -418,7 +436,7 @@ $(document).ready(function() {
     POPUP_INS_SEL = {
         'movies.netflix.com' : {
             'Wi': WiObj, // main page selector
-            'Queue' : selectObj('.info', 'before', 800), // queue page selector
+            'Queue' : selectObj('.info', 'before', 800, '.icon-pull'), // queue page selector
         },
         'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
     };
