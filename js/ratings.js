@@ -105,7 +105,7 @@ function checkCache(title) {
         }
     }
 
-    var cachedVal = JSON.parse(CACHE[title])
+    var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
     if (cachedVal !== undefined && cachedVal.tomato !== undefined && cachedVal.year !== null){
         var now = new Date().getTime();
@@ -150,13 +150,7 @@ function clearOld(args){
 }
 
 function getTomatoClass(score) {
-    var klass;
-    if (score < 59) {
-        klass = 'rotten';
-    } else {
-        klass = 'fresh';
-    }
-    return klass
+    return score < 59 ? 'rotten' : 'fresh';
 }
 
 
@@ -272,10 +266,10 @@ function getRating(title, year, addArgs, callback) {
     }
     $.get(getIMDBAPI(title, year), function(res){
         try {
-          res = JSON.parse(res)
+          res = JSON.parse(res);
         } catch(e){
           res = {
-                'Response' : 'False'
+                'Response' : 'False',
             };
         }
         
@@ -320,7 +314,7 @@ function showRating(rating, args) {
     Call the API with the year and update the rating if neccessary
 */
 function updateCache(title) {
-    var cachedVal = checkCache(title).cachedVal
+    var cachedVal = checkCache(title).cachedVal;
     if (cachedVal.year === null) {
         var year = parseYear();
         getRating(title, year, null, function(rating){
