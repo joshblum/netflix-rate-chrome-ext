@@ -23,7 +23,7 @@
   margin-top: 5px;
 }
 
-.icon-pull {
+.queue-icon {
   margin-left: -10px;
 }
 
@@ -32,6 +32,14 @@
   display: inline-block;
   vertical-align: text-bottom;
   background: transparent url('../img/tomatoSprite.png') no-repeat -312px -160px;
+}
+
+.search-rt-icon {
+  margin-left: 12px !important;
+}
+
+.dvd-rt-icon {
+  margin-left: 10px !important;
 }
 
 .tomato-icon.med.rotten {
@@ -80,7 +88,7 @@
 .dvd-popup {
   margin-bottom: -15px;
   margin-top: -29px;
-  margin-left: 74px;
+  margin-left: 45px;
 }
 
 .dvd-search-page {

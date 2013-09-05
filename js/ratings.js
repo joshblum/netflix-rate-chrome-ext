@@ -107,7 +107,7 @@ function checkCache(title) {
 
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
-    if (cachedVal !== undefined && cachedVal.tomato !== undefined && cachedVal.year !== null){
+    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null){
         var now = new Date().getTime();
         var lifetime = now - cachedVal.date;
         if(lifetime <= CACHE_LIFE) {
@@ -381,7 +381,7 @@ function displaySearch(args){
 /////////// HTML BUILDERS ////////////
 function getIMDBHtml(score, imdbID, title, klass) {
     var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getIMDBLink(imdbID)) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
-    if (score === null) {
+    if (!score) {
         html.css('visibility', 'hidden');
     } else {
         html.find('.imdb').addClass(klass).append(score.toFixed(1));
@@ -391,18 +391,17 @@ function getIMDBHtml(score, imdbID, title, klass) {
 
 function getTomatoHtml(tomatoMeter, tomatoUserMeter, title, klass) {
     var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(title)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
-    if (tomatoMeter === null || tomatoUserMeter === null) {
+    if (!tomatoMeter || !tomatoUserMeter) {
         html.css('visibility', 'hidden');
         return html
     }
 
-    html.find('.tomato-icon').addClass(getTomatoClass(tomatoMeter));
+    html.find('.tomato-icon').addClass(getTomatoClass(tomatoMeter)).addClass(klass);
     html.find('.tomato-score').append(tomatoMeter + '%');    
 
-    html.find('.audience-icon').addClass(getTomatoClass(tomatoUserMeter));
+    html.find('.audience-icon').addClass(getTomatoClass(tomatoUserMeter)).addClass(klass);
     html.find('.audience-score').append(tomatoUserMeter + '%');
-    
-    html.addClass(klass); //add custom class
+
     return html
 }
 
@@ -423,14 +422,14 @@ function escapeHTML(str) {
 ///////// INIT /////////////
 $(document).ready(function() {
     //common select objects
-    var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup');
-    var WiObj = selectObj('.midBob', 'append', 700);
+    var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup', 'dvd-rt-icon');
+    var WiObj = selectObj('.midBob', 'append', 800);
 
     //poup select types
     POPUP_INS_SEL = {
         'movies.netflix.com' : {
             'Wi': WiObj, // main page selector
-            'Queue' : selectObj('.info', 'before', 800, '.icon-pull'), // queue page selector
+            'Queue' : selectObj('.info', 'before', 800, 'queue-icon'), // queue page selector
         },
         'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
     };
@@ -438,8 +437,8 @@ $(document).ready(function() {
     //search select types
     SEARCH_SEL = {
         //search page selectors
-        'Search' : selectObj('.bluray', 'append', -1, 'dvd-search-page'),
-        'WiSearch' : selectObj('.actions', 'append', -1, 'wi-search-page'),
+        'Search' : selectObj('.bluray', 'append', -1, 'dvd-search-page', 'search-rt-icon'),
+        'WiSearch' : selectObj('.actions', 'append', -1, 'wi-search-page', 'search-rt-icon'),
     };
 
     addStyle(); //add ratings.css to the page 
