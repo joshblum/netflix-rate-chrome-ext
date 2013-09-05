@@ -26,7 +26,7 @@
         "http://www.omdbapi.com/*", 
         "http://*.netflix.com/*"
     ], 
-    "version": "1.3.19", 
+    "version": "1.3.20", 
     "web_accessible_resources": [
         "css/ratings.css", 
         "img/imdbSprite.png", 
