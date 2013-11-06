@@ -7,7 +7,7 @@
 // callback  name (optional)     JSONP callback name
 // tomatoes  true (optional)     adds rotten tomatoes data
 var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true";
-var TOMATO_LINK = "http://www.rottentomatoes.com/search/?sitesearch=rt&search=";
+var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 
 //popup movie selectors
@@ -177,8 +177,9 @@ function getIMDBLink(title) {
 /*
     Build the url for the rtLink
 */
-function getTomatoLink(title) {
-    return TOMATO_LINK + title
+function getTomatoLink(imdbID) {
+    imdbID = imdbID.slice(2) //convert tt123456 -> 123456
+    return TOMATO_LINK + imdbID
 }
 
 
@@ -327,8 +328,8 @@ function updateCache(title) {
     Build and display the ratings
 */
 function displayRating(rating, args) {
-    var imdb = getIMDBHtml(rating.imdb, rating.imdbID, rating.title, args.imdbClass);
-    var tomato = getTomatoHtml(rating.tomatoMeter, rating.tomatoUserMeter, rating.title, args.rtClass);
+    var imdb = getIMDBHtml(rating, args.imdbClass);
+    var tomato = getTomatoHtml(rating, args.rtClass);
     var $target = $(args.selector);
     $target[args.insertFunc](imdb);
     $target[args.insertFunc](tomato);
@@ -379,8 +380,9 @@ function displaySearch(args){
 
 
 /////////// HTML BUILDERS ////////////
-function getIMDBHtml(score, imdbID, title, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getIMDBLink(imdbID)) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
+function getIMDBHtml(rating, klass) {
+    var score = rating.imdb;
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getIMDBLink(rating.imdbID)) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
     if (!score) {
         html.css('visibility', 'hidden');
     } else {
@@ -389,18 +391,18 @@ function getIMDBHtml(score, imdbID, title, klass) {
     return html
 }
 
-function getTomatoHtml(tomatoMeter, tomatoUserMeter, title, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(title)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
-    if (!tomatoMeter || !tomatoUserMeter) {
+function getTomatoHtml(rating, klass) {
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(rating.imdbID)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
+    if (!rating.tomatoMeter || !rating.tomatoUserMeter) {
         html.css('visibility', 'hidden');
         return html
     }
 
-    html.find('.tomato-icon').addClass(getTomatoClass(tomatoMeter)).addClass(klass);
-    html.find('.tomato-score').append(tomatoMeter + '%');    
+    html.find('.tomato-icon').addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
+    html.find('.tomato-score').append(rating.tomatoMeter + '%');    
 
-    html.find('.audience-icon').addClass(getTomatoClass(tomatoUserMeter)).addClass(klass);
-    html.find('.audience-score').append(tomatoUserMeter + '%');
+    html.find('.audience-icon').addClass(getTomatoClass(rating.tomatoUserMeter)).addClass(klass);
+    html.find('.audience-score').append(rating.tomatoUserMeter + '%');
 
     return html
 }
