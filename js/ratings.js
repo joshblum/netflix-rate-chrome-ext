@@ -6,40 +6,40 @@
 // plot  short, full     short or extended plot (short default)
 // callback  name (optional)     JSONP callback name
 // tomatoes  true (optional)     adds rotten tomatoes data
-var IMDB_API =  "http://www.omdbapi.com/?tomatoes=true";
+var IMDB_API = "http://www.omdbapi.com/?tomatoes=true";
 var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 
 //popup movie selectors
 var HOVER_SEL = {
-        '.bobbable .popLink' : getWIMainTitle, //wi main display movies
-        '.mdpLink' : getSideOrDVDTitle,
-    };
+    '.bobbable .popLink': getWIMainTitle, //wi main display movies
+    '.mdpLink': getSideOrDVDTitle,
+};
 
 var CACHE = localStorage;
-var CACHE_LIFE = 1000*60*60*24*7*2; //two weeks in milliseconds
+var CACHE_LIFE = 1000 * 60 * 60 * 24 * 7 * 2; //two weeks in milliseconds
 
 /////////// HELPERS /////////////
 /*
     Builds a select object where the selector is used to insert the ratings via the given insertFunc. Interval specifies the interval necessary for the popupDelay. imdb and rt classes are extra classes that can be added to a rating.
 */
-function selectObj(selector, insertFunc, interval, imdbClass, rtClass){
+function selectObj(selector, insertFunc, interval, imdbClass, rtClass) {
     imdbClass = imdbClass || '';
     rtClass = rtClass || '';
     return {
-        'selector' : selector,
-        'insertFunc' : insertFunc,
-        'interval' : interval,
-        'imdbClass' : imdbClass,
-        'rtClass' : rtClass,
-        }
+        'selector': selector,
+        'insertFunc': insertFunc,
+        'interval': interval,
+        'imdbClass': imdbClass,
+        'rtClass': rtClass,
+    }
 }
 
 /*
     Add the style sheet to the main netflix page.
 */
 function addStyle() {
-    if (!$('#rating-overlay').length){
+    if (!$('#rating-overlay').length) {
         var url = chrome.extension.getURL('../css/ratings.css');
         $("head").append("<link id='rating-overlay' href='" + url + "' type='text/css' rel='stylesheet' />");
     }
@@ -84,39 +84,39 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year) {
 
     var date = new Date().getTime();
     var rating = {
-        'title' : title,
-        'imdb' : imdb,
-        'tomatoMeter' : tomatoMeter,
-        'tomatoUserMeter' : tomatoUserMeter,
-        'imdbID' : imdbID,
-        'year' : year,
-        'date' : date,
+        'title': title,
+        'imdb': imdb,
+        'tomatoMeter': tomatoMeter,
+        'tomatoUserMeter': tomatoUserMeter,
+        'imdbID': imdbID,
+        'year': year,
+        'date': date,
     };
-    
+
     CACHE[title] = JSON.stringify(rating);
     return rating
 }
 
 function checkCache(title) {
-    if(!(title in CACHE)) {
+    if (!(title in CACHE)) {
         return {
-            'inCache' : false,
-            'cachedVal' : null,
+            'inCache': false,
+            'cachedVal': null,
         }
     }
 
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
-    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null){
+    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null) {
         var now = new Date().getTime();
         var lifetime = now - cachedVal.date;
-        if(lifetime <= CACHE_LIFE) {
+        if (lifetime <= CACHE_LIFE) {
             inCache = true;
         }
     }
     return {
-        'inCache' : inCache,
-        'cachedVal' : cachedVal,
+        'inCache': inCache,
+        'cachedVal': cachedVal,
     }
 }
 
@@ -127,7 +127,7 @@ function getWrappedTitle(e, key, regex) {
     var title = $(e.target).attr('alt');
     if (title === undefined) {
         var url = $(e.target).context.href;
-        if (typeof url === "undefined"){
+        if (typeof url === "undefined") {
             return ""
         }
         url = url.split('/');
@@ -140,9 +140,9 @@ function getWrappedTitle(e, key, regex) {
 /*
     Clear old ratings and unused content. Differs for different popups
 */
-function clearOld(args){
+function clearOld(args) {
     var $target = $('#BobMovie');
-    if (args.key in POPUP_INS_SEL['movies.netflix.com']){
+    if (args.key in POPUP_INS_SEL['movies.netflix.com']) {
         $target.find('.label').contents().remove();
     }
     $target.find('.rating-link').remove();
@@ -214,20 +214,20 @@ function getSideOrDVDTitle(e) {
     var key = 'dvd.netflix.com';
     if (url.indexOf(key) != -1) { // we are in dvds now
         return getDVDTitle(e)
-    } 
+    }
     return getSideTitle(e)
 }
 
 function getSideTitle(e) {
     var key = "WiMovie";
     var regex = /_/g;
-    return getWrappedTitle(e, key,regex)
+    return getWrappedTitle(e, key, regex)
 }
 
 function getDVDTitle(e) {
     var key = "Movie";
     var regex = /-/g;
-    return getWrappedTitle(e, key,regex)
+    return getWrappedTitle(e, key, regex)
 }
 
 function parseYear($target) {
@@ -242,15 +242,15 @@ function parseYear($target) {
 /*
     Parse the search title for a given search result
 */
-function parseSearchTitle($target){
+function parseSearchTitle($target) {
     return $target.find('.title').children().text();
 }
 
 /////////// RATING HANDLERS ////////////
-function eventHandler(e){
+function eventHandler(e) {
     var title = e.data(e); //title parse funtion
     if ($('.label').contents() != '') { //the popup isn't already up
-        getRating(title, null, null, function(rating){ //null year, null addArgs
+        getRating(title, null, null, function(rating) { //null year, null addArgs
             showRating(rating, getArgs());
         });
     }
@@ -261,20 +261,20 @@ function eventHandler(e){
 */
 function getRating(title, year, addArgs, callback) {
     var cached = checkCache(title);
-    if (cached.inCache){
+    if (cached.inCache) {
         callback(cached.cachedVal, addArgs);
         return
     }
-    $.get(getIMDBAPI(title, year), function(res){
+    $.get(getIMDBAPI(title, year), function(res) {
         try {
-          res = JSON.parse(res);
-        } catch(e){
-          res = {
-                'Response' : 'False',
+            res = JSON.parse(res);
+        } catch (e) {
+            res = {
+                'Response': 'False',
             };
         }
-        
-        if (res.Response === 'False'){
+
+        if (res.Response === 'False') {
             addCache(title);
             return null
         }
@@ -300,9 +300,9 @@ function showRating(rating, args) {
     if (!args.interval) { // unknown popup
         return
     }
-    var checkVisible = setInterval(function(){
+    var checkVisible = setInterval(function() {
         var $target = $(args.selector);
-        if($target.length){
+        if ($target.length) {
             clearInterval(checkVisible);
             updateCache(rating.title); //run the query with the year to update
             clearOld(args);
@@ -318,7 +318,7 @@ function updateCache(title) {
     var cachedVal = checkCache(title).cachedVal;
     if (cachedVal.year === null) {
         var year = parseYear();
-        getRating(title, year, null, function(rating){
+        getRating(title, year, null, function(rating) {
             showRating(rating, getArgs());
         });
     }
@@ -359,18 +359,18 @@ function searchSetup() {
 /*
     Find ratings for all of the movies found by the search and display them
 */
-function displaySearch(args){
+function displaySearch(args) {
 
     var selector = args.selector;
-    $.each($(args.selectorClass), function(index, target){ // iterate over movies found
+    $.each($(args.selectorClass), function(index, target) { // iterate over movies found
         var $target = $(target);
         var year = parseYear($target.find('.year'));
         var title = parseSearchTitle($target);
         var addArgs = {
-            'target' : $target,
-            'selector' : selector,
+            'target': $target,
+            'selector': selector,
         }; // add the current target so the rating matches the movie found
-        getRating(title, year, addArgs, function(rating, addArgs){
+        getRating(title, year, addArgs, function(rating, addArgs) {
             args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
 
             displayRating(rating, args);
@@ -399,7 +399,7 @@ function getTomatoHtml(rating, klass) {
     }
 
     html.find('.tomato-icon').addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
-    html.find('.tomato-score').append(rating.tomatoMeter + '%');    
+    html.find('.tomato-score').append(rating.tomatoMeter + '%');
 
     html.find('.audience-icon').addClass(getTomatoClass(rating.tomatoUserMeter)).addClass(klass);
     html.find('.audience-score').append(rating.tomatoUserMeter + '%');
@@ -412,7 +412,7 @@ function getTomatoHtml(rating, klass) {
 */
 function escapeHTML(str) {
     return str.replace(/[&"<>]/g, function(m) {
-        return { 
+        return {
             "&": "&amp;",
             '"': "&quot;",
             "<": "&lt;",
@@ -429,24 +429,24 @@ $(document).ready(function() {
 
     //poup select types
     POPUP_INS_SEL = {
-        'movies.netflix.com' : {
+        'movies.netflix.com': {
             'Wi': WiObj, // main page selector
-            'Queue' : selectObj('.info', 'before', 800, 'queue-icon'), // queue page selector
+            'Queue': selectObj('.info', 'before', 800, 'queue-icon'), // queue page selector
         },
-        'dvd.netflix.com' : dvdSelObj, // dvdqueue page selector
+        'dvd.netflix.com': dvdSelObj, // dvdqueue page selector
     };
 
     //search select types
     SEARCH_SEL = {
         //search page selectors
-        'Search' : selectObj('.bluray', 'append', -1, 'dvd-search-page', 'search-rt-icon'),
-        'WiSearch' : selectObj('.actions', 'append', -1, 'wi-search-page', 'search-rt-icon'),
+        'Search': selectObj('.bluray', 'append', -1, 'dvd-search-page', 'search-rt-icon'),
+        'WiSearch': selectObj('.actions', 'append', -1, 'wi-search-page', 'search-rt-icon'),
     };
 
     addStyle(); //add ratings.css to the page 
     searchSetup(); // check if this is a search page
 
-    $.each(HOVER_SEL, function(selector, parser){ //add listeners for each hover selector
+    $.each(HOVER_SEL, function(selector, parser) { //add listeners for each hover selector
         $(document).on('mouseenter', selector, parser, eventHandler);
     });
 });
