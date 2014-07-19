@@ -443,7 +443,7 @@ $(document).ready(function() {
         'WiSearch': selectObj('.actions', 'append', -1, 'wi-search-page', 'search-rt-icon'),
     };
 
-    addStyle(); //add ratings.css to the page 
+    addStyle(); //add ratings.css to the page
     searchSetup(); // check if this is a search page
 
     $.each(HOVER_SEL, function(selector, parser) { //add listeners for each hover selector

@@ -2,7 +2,7 @@ import json
 
 MANIFEST_PATH = "manifest.json"
 
-def rewriteManifest():
+def rewrite_manifest():
 
     with open(MANIFEST_PATH, "r+") as f:
         data = json.load(f)
@@ -20,7 +20,7 @@ def main():
         rewrite main.js to replace the baseUrl and update manifest.json to have a new manifest
     """
 
-    rewriteManifest()
+    rewrite_manifest()
 
 if __name__ == "__main__":
     main()
