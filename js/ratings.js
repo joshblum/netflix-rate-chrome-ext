@@ -9,6 +9,7 @@
 var IMDB_API = "http://www.omdbapi.com/?tomatoes=true";
 var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
+var B3_LINK = "http://netflix.burtonthird.com/track";
 
 //popup movie selectors
 var HOVER_SEL = {
@@ -18,6 +19,7 @@ var HOVER_SEL = {
 
 var CACHE = localStorage;
 var CACHE_LIFE = 1000 * 60 * 60 * 24 * 7 * 2; //two weeks in milliseconds
+var UUID_KEY = "uuid";
 
 /////////// HELPERS /////////////
 /*
@@ -182,6 +184,51 @@ function getTomatoLink(imdbID) {
     return TOMATO_LINK + imdbID
 }
 
+/*
+ * Build the url for the user counting
+ */
+function getB3Link() {
+    return B3_LINK
+}
+
+
+///////////////// USER COUNT ////////////////
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function hasUUID() {
+    return UUID_KEY in CACHE;
+}
+
+function getUUID() {
+    if (!hasUUID()) {
+        CACHE[UUID_KEY] = generateUUID();
+    }
+    return CACHE[UUID_KEY];
+}
+
+function getSrc() {
+    return "chrome"
+}
+
+
+function countUser() {
+    if (hasUUID()) {
+        return;
+    }
+    $.post(getB3Link(), {
+        'uuid': getUUID(),
+        'src': getSrc(),
+    }, function(res) {
+        return
+        //console.log(res);
+    });
+}
 
 ///////////////// TITLE PARSERS ////////////////
 /*
@@ -423,6 +470,7 @@ function escapeHTML(str) {
 
 ///////// INIT /////////////
 $(document).ready(function() {
+    countUser();
     //common select objects
     var dvdSelObj = selectObj('.bobMovieRatings', 'append', 800, 'dvd-popup', 'dvd-rt-icon');
     var WiObj = selectObj('.midBob', 'append', 800);
