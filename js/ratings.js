@@ -20,6 +20,7 @@ var HOVER_SEL = {
 var CACHE = localStorage;
 var CACHE_LIFE = 1000 * 60 * 60 * 24 * 7 * 2; //two weeks in milliseconds
 var UUID_KEY = "uuid";
+var DATE_KEY = "created_at";
 
 /////////// HELPERS /////////////
 /*
@@ -202,12 +203,13 @@ function generateUUID() {
 }
 
 function hasUUID() {
-    return UUID_KEY in CACHE;
+    return UUID_KEY in CACHE && DATE_KEY in CACHE;
 }
 
 function getUUID() {
     if (!hasUUID()) {
         CACHE[UUID_KEY] = generateUUID();
+        CACHE[DATE_KEY] = new Date();
     }
     return CACHE[UUID_KEY];
 }
