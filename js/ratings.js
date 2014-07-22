@@ -214,6 +214,11 @@ function getUUID() {
     return CACHE[UUID_KEY];
 }
 
+function clearUUIDCache() {
+    delete CACHE[UUID_KEY];
+    delete CACHE[DATE_KEY];
+}
+
 function getSrc() {
     return "chrome"
 }
@@ -227,8 +232,9 @@ function countUser() {
         'uuid': getUUID(),
         'src': getSrc(),
     }, function(res) {
-        return
-        //console.log(res);
+        return;
+    }).fail(function(res) {
+        clearUUIDCache();
     });
 }
 
