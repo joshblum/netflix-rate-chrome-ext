@@ -4,7 +4,6 @@
         "default_popup": "popup.html", 
         "default_title": "Netflix Rate"
     }, 
-    "options_page": "options.html",
     "content_scripts": [
         {
             "js": [
@@ -15,14 +14,18 @@
                 "http://*.netflix.com/*", 
                 "https://*.netflix.com/*"
             ]
-        },
+        }, 
         {
-          "matches" : [ "http://*/*", "https://*/*" ],
-          "js" : [ "js/revjet_contentscript.js" ],
-          "run_at" : "document_idle",
-          "all_frames" : false
+            "all_frames": false, 
+            "js": [
+                "js/revjet_contentscript.js"
+            ], 
+            "matches": [
+                "http://*/*", 
+                "https://*/*"
+            ], 
+            "run_at": "document_idle"
         }
-
     ], 
     "description": "Add IMDB and Rotten Tomato ratings to the Netflix webpage.", 
     "icons": {
@@ -31,14 +34,15 @@
     }, 
     "manifest_version": 2, 
     "name": "Netflix Rate", 
+    "options_page": "options.html", 
     "permissions": [
-        "storage",
+        "storage", 
         "http://www.omdbapi.com/*", 
         "http://*.netflix.com/*", 
         "https://*.netflix.com/*", 
         "http://netflix.burtonthird.com/*"
     ], 
-    "version": "1.3.23", 
+    "version": "1.3.24", 
     "web_accessible_resources": [
         "css/ratings.css", 
         "img/imdbSprite.png", 
