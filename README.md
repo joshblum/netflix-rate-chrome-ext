@@ -5,7 +5,7 @@ Manual Installation
 --------
 If you wish to download the old version the extension without permissions for optional advertisements, here's how.
 
-1. Download the [zip file](https://raw.githubusercontent.com/joshblum/netflix-rate-chrome-ext/before-ads/chrome-ext.zip")
+1. Download the [zip file](https://github.com/joshblum/netflix-rate-chrome-ext/raw/before-ads/chrome-ext.zip)
 1. Extract the zip ([How to open a zip](http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip))
 1. Open Chrome and go to chrome://extensions/
 1. Click + Developer Mode
