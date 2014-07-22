@@ -8,10 +8,7 @@ If you wish to download the old version the extension without permissions for op
 1. Download the [zip file](https://github.com/joshblum/netflix-rate-chrome-ext/raw/before-ads/chrome-ext.zip)
 1. Extract the zip ([How to open a zip](http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip))
 1. Open Chrome and go to chrome://extensions/
-1. Click + Developer Mode
-1. Click Load unpacked extension
-1. Find the extension folder and click OK
-1. Delete the downloaded file
+1. Drag the folder into the Chrome browser window (you'll see "Install" appear on hover)
 1. Contact [netflix-rate-feedback@mit.edu](mailto:netflix-rate-feedback@mit.edu) with any questions :)
 
 About
