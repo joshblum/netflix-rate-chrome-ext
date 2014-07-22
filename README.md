@@ -1,6 +1,17 @@
 netflix-rate
 ================
 
+Manual Installation
+--------
+1. Download the (asdf "zip file")
+1. Extract the zip (http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip, "how to open a zip")
+1. Open Chrome and go to chrome://extensions/
+1. Click + Developer Mode
+1. Click Load unpacked extension
+1. Find the extension folder and click OK
+1. Delete the downloaded file
+1. Contact [netflix-rate-feedback@mit.edu](mailto:netflix-rate-feedback@mit.edu) with any questions
+
 A Chrome extension that adds IMDB and Rotten Tomato ratings to the Netflix webpage.
 
 Download directly from the <a href="https://chrome.google.com/webstore/detail/netflix-rate/ecaaapiecdienibfgolcopgnicppkmhn?hl=en" target="_blank">Chrome Web Store</a>.
