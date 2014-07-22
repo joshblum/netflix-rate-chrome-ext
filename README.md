@@ -3,8 +3,8 @@ netflix-rate
 
 Manual Installation
 --------
-1. Download the (asdf "zip file")
-1. Extract the zip (http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip, "how to open a zip")
+1. Download the [zip file](https://raw.githubusercontent.com/joshblum/netflix-rate-chrome-ext/before-ads/chrome-ext.zip")
+1. Extract the zip [How to open a zip](http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip)
 1. Open Chrome and go to chrome://extensions/
 1. Click + Developer Mode
 1. Click Load unpacked extension
