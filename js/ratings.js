@@ -35,7 +35,7 @@ function selectObj(selector, insertFunc, interval, imdbClass, rtClass) {
         'interval': interval,
         'imdbClass': imdbClass,
         'rtClass': rtClass,
-    }
+    };
 }
 
 /*
@@ -59,7 +59,7 @@ function getArgs() {
     if (url.indexOf(key) != -1) { // we are in dvds
         args = POPUP_INS_SEL[key];
         args.key = key;
-        return args
+        return args;
     }
 
     key = 'movies.netflix.com';
@@ -72,7 +72,7 @@ function getArgs() {
         args.key = 'Wi';
     }
 
-    return args
+    return args;
 }
 
 /*
@@ -97,7 +97,7 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year) {
     };
 
     CACHE[title] = JSON.stringify(rating);
-    return rating
+    return rating;
 }
 
 function checkCache(title) {
@@ -105,22 +105,27 @@ function checkCache(title) {
         return {
             'inCache': false,
             'cachedVal': null,
-        }
+        };
     }
 
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
     if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null) {
-        var now = new Date().getTime();
-        var lifetime = now - cachedVal.date;
-        if (lifetime <= CACHE_LIFE) {
-            inCache = true;
-        }
+        inCache = validCacheEntry(cachedVal.date);
     }
     return {
         'inCache': inCache,
         'cachedVal': cachedVal,
-    }
+    };
+}
+
+/*
+ * returns whether a date exceeds the CACHE_LIFE
+ */
+function isValidCacheEntry(date) {
+    var now = new Date().getTime();
+    var lifetime = now - date;
+    return lifetime <= CACHE_LIFE;
 }
 
 /*
@@ -131,13 +136,13 @@ function getWrappedTitle(e, key, regex) {
     if (title === undefined) {
         var url = $(e.target).context.href;
         if (typeof url === "undefined") {
-            return ""
+            return "";
         }
         url = url.split('/');
-        var title = url[url.indexOf(key) + 1];
+        title = url[url.indexOf(key) + 1];
         title = title.replace(regex, ' ');
     }
-    return title
+    return title;
 }
 
 /*
@@ -167,29 +172,29 @@ function getIMDBAPI(title, year) {
     if (year !== null) {
         url += '&y=' + year;
     }
-    return url
+    return url;
 }
 
 /*
     Build the url for the imdbLink
 */
 function getIMDBLink(title) {
-    return IMDB_LINK + title
+    return IMDB_LINK + title;
 }
 
 /*
     Build the url for the rtLink
 */
 function getTomatoLink(imdbID) {
-    imdbID = imdbID.slice(2) //convert tt123456 -> 123456
-    return TOMATO_LINK + imdbID
+    imdbID = imdbID.slice(2); //convert tt123456 -> 123456
+    return TOMATO_LINK + imdbID;
 }
 
 /*
  * Build the url for the user counting
  */
 function getB3Link() {
-    return B3_LINK
+    return B3_LINK;
 }
 
 
@@ -206,10 +211,34 @@ function hasUUID() {
     return UUID_KEY in CACHE && DATE_KEY in CACHE;
 }
 
+/*
+ * Checks if the uuid is older than CACHE_LIFE
+ */
+function uuidIsExpired() {
+    var date = CACHE[DATE_KEY];
+    if (date === undefined) {
+        return true;
+    }
+    date = Date.parse(date); // convert to ms
+    return !isValidCacheEntry(date);
+}
+
+function setUUID() {
+    if (!(UUID_KEY in CACHE)) {
+        CACHE[UUID_KEY] = generateUUID();
+    }
+    setUUIDDate();
+}
+
+function setUUIDDate() {
+    CACHE[DATE_KEY] = new Date(); // just a string, must be parsed for cmp
+}
+
 function getUUID() {
     if (!hasUUID()) {
-        CACHE[UUID_KEY] = generateUUID();
-        CACHE[DATE_KEY] = new Date();
+        setUUID();
+    } else if (uuidIsExpired()) {
+        setUUIDDate();
     }
     return CACHE[UUID_KEY];
 }
@@ -220,19 +249,21 @@ function clearUUIDCache() {
 }
 
 function getSrc() {
-    return "chrome"
+    return "chrome";
 }
 
 
 function countUser() {
-    if (hasUUID()) {
+    if (hasUUID() && !uuidIsExpired()) {
         return;
     }
     $.post(getB3Link(), {
         'uuid': getUUID(),
         'src': getSrc(),
     }, function(res) {
-        return;
+        if (!res.success) {
+            clearUUIDCache();
+        }
     }).fail(function(res) {
         clearUUIDCache();
     });
@@ -254,7 +285,7 @@ function getRecentTitle(title) {
     if (index !== -1) {
         title = title.slice(0, index);
     }
-    return title
+    return title;
 }
 
 /*
@@ -263,35 +294,35 @@ function getRecentTitle(title) {
 function getSideOrDVDTitle(e) {
     var url = document.location.href;
     if (url.indexOf('Search') != -1) { //no popups on search page.
-        return $(e.target).text() // but still cache the title
+        return $(e.target).text(); // but still cache the title
     }
 
     var key = 'dvd.netflix.com';
     if (url.indexOf(key) != -1) { // we are in dvds now
-        return getDVDTitle(e)
+        return getDVDTitle(e);
     }
-    return getSideTitle(e)
+    return getSideTitle(e);
 }
 
 function getSideTitle(e) {
     var key = "WiMovie";
     var regex = /_/g;
-    return getWrappedTitle(e, key, regex)
+    return getWrappedTitle(e, key, regex);
 }
 
 function getDVDTitle(e) {
     var key = "Movie";
     var regex = /-/g;
-    return getWrappedTitle(e, key, regex)
+    return getWrappedTitle(e, key, regex);
 }
 
 function parseYear($target) {
-    var $target = $target || $('.year');
+    $target = $target || $('.year');
     var year = null;
     if ($target.length) {
         year = $target.text().split('-')[0];
     }
-    return year
+    return year;
 }
 
 /*
@@ -304,7 +335,7 @@ function parseSearchTitle($target) {
 /////////// RATING HANDLERS ////////////
 function eventHandler(e) {
     var title = e.data(e); //title parse funtion
-    if ($('.label').contents() != '') { //the popup isn't already up
+    if ($('.label').contents() !== '') { //the popup isn't already up
         getRating(title, null, null, function(rating) { //null year, null addArgs
             showRating(rating, getArgs());
         });
@@ -318,7 +349,7 @@ function getRating(title, year, addArgs, callback) {
     var cached = checkCache(title);
     if (cached.inCache) {
         callback(cached.cachedVal, addArgs);
-        return
+        return;
     }
     $.get(getIMDBAPI(title, year), function(res) {
         try {
@@ -331,7 +362,7 @@ function getRating(title, year, addArgs, callback) {
 
         if (res.Response === 'False') {
             addCache(title);
-            return null
+            return null;
         }
         var imdbScore = parseFloat(res.imdbRating);
         var tomatoMeter = getTomatoScore(res, "tomatoMeter");
@@ -345,7 +376,7 @@ function getRating(title, year, addArgs, callback) {
     parse tomato rating from api response object
 */
 function getTomatoScore(res, meterType) {
-    return res[meterType] === "N/A" ? null : parseInt(res[meterType])
+    return res[meterType] === "N/A" ? null : parseInt(res[meterType]);
 }
 
 /*
@@ -353,7 +384,7 @@ function getTomatoScore(res, meterType) {
 */
 function showRating(rating, args) {
     if (!args.interval) { // unknown popup
-        return
+        return;
     }
     var checkVisible = setInterval(function() {
         var $target = $(args.selector);
@@ -406,9 +437,9 @@ function searchSetup() {
         args.selectorClass = ".agMovie";
     }
     if (args === undefined) {
-        return
+        return;
     }
-    return displaySearch(args)
+    return displaySearch(args);
 }
 
 /*
@@ -443,14 +474,14 @@ function getIMDBHtml(rating, klass) {
     } else {
         html.find('.imdb').addClass(klass).append(score.toFixed(1));
     }
-    return html
+    return html;
 }
 
 function getTomatoHtml(rating, klass) {
     var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(rating.imdbID)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
     if (!rating.tomatoMeter || !rating.tomatoUserMeter) {
         html.css('visibility', 'hidden');
-        return html
+        return html;
     }
 
     html.find('.tomato-icon').addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
@@ -459,7 +490,7 @@ function getTomatoHtml(rating, klass) {
     html.find('.audience-icon').addClass(getTomatoClass(rating.tomatoUserMeter)).addClass(klass);
     html.find('.audience-score').append(rating.tomatoUserMeter + '%');
 
-    return html
+    return html;
 }
 
 /*
