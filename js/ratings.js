@@ -252,7 +252,6 @@ function getSrc() {
     return "chrome";
 }
 
-
 function countUser() {
     if (hasUUID() && !uuidIsExpired()) {
         return;
