@@ -111,7 +111,7 @@ function checkCache(title) {
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
     if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null) {
-        inCache = validCacheEntry(cachedVal.date);
+        inCache = isValidCacheEntry(cachedVal.date);
     }
     return {
         'inCache': inCache,
