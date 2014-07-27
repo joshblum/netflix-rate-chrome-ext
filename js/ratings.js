@@ -17,6 +17,13 @@ var HOVER_SEL = {
     '.mdpLink': getSideOrDVDTitle,
 };
 
+/////////// PREFETCHING /////////////
+var PREFETCH_CHUNK_SIZE = 5;
+var PREFETCH_INTERVAL = 2500;
+var PREFETCH_SEL = {
+    '.boxShotImg': getImgTitle,
+};
+
 var CACHE = localStorage;
 var CACHE_LIFE = 1000 * 60 * 60 * 24 * 7 * 2; //two weeks in milliseconds
 var UUID_KEY = "uuid";
@@ -315,6 +322,13 @@ function getDVDTitle(e) {
     return getWrappedTitle(e, key, regex);
 }
 
+/*
+ * Parse a title given an element, not event
+ */
+function getImgTitle(el) {
+    return el.alt;
+}
+
 function parseYear($target) {
     $target = $target || $('.year');
     var year = null;
@@ -332,7 +346,37 @@ function parseSearchTitle($target) {
 }
 
 /////////// RATING HANDLERS ////////////
-function eventHandler(e) {
+
+/*
+ * Find all of the elements with the given selector and try to
+ * prefetch the title information. This should reduce lag once we cache everything.
+ */
+function prefetchHandler(selector, parser) {
+    var start = 0;
+    var end = PREFETCH_CHUNK_SIZE;
+    var delay = PREFETCH_INTERVAL;
+    var $targets = $(selector);
+    var $slice;
+    while (end < $targets.size()) {
+        $slice = $targets.slice(start, end);
+        setTimeout(function() {
+            prefetchChunkProcessor($slice, parser);
+        }, delay);
+        start = end;
+        end += PREFETCH_CHUNK_SIZE;
+        end = Math.min(end, $targets.size());
+        delay += PREFETCH_INTERVAL;
+    }
+}
+
+function prefetchChunkProcessor($slice, parser) {
+    $.each($slice, function(index, element) {
+        var title = parser(element);
+        getRating(title, null, null, null);
+    });
+}
+
+function popupHandler(e) {
     var title = e.data(e); //title parse funtion
     if ($('.label').contents() !== '') { //the popup isn't already up
         getRating(title, null, null, function(rating) { //null year, null addArgs
@@ -347,7 +391,9 @@ function eventHandler(e) {
 function getRating(title, year, addArgs, callback) {
     var cached = checkCache(title);
     if (cached.inCache) {
-        callback(cached.cachedVal, addArgs);
+        if (callback) {
+            callback(cached.cachedVal, addArgs);
+        }
         return;
     }
     $.get(getIMDBAPI(title, year), function(res) {
@@ -367,7 +413,9 @@ function getRating(title, year, addArgs, callback) {
         var tomatoMeter = getTomatoScore(res, "tomatoMeter");
         var tomatoUserMeter = getTomatoScore(res, "tomatoUserMeter");
         var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter, res.imdbID, year);
-        callback(rating, addArgs);
+        if (callback) {
+            callback(rating, addArgs);
+        }
     });
 }
 
@@ -400,7 +448,9 @@ function showRating(rating, args) {
     Call the API with the year and update the rating if neccessary
 */
 function updateCache(title) {
-    var cachedVal = checkCache(title).cachedVal;
+    var cached = checkCache(title);
+    if (!cached.inCache) return;
+    var cachedVal = cached.cachedVal;
     if (cachedVal.year === null) {
         var year = parseYear();
         getRating(title, year, null, function(rating) {
@@ -457,7 +507,6 @@ function displaySearch(args) {
         }; // add the current target so the rating matches the movie found
         getRating(title, year, addArgs, function(rating, addArgs) {
             args.selector = addArgs.target.find(addArgs.selector); // store selector to show rating on.
-
             displayRating(rating, args);
         });
     });
@@ -533,6 +582,11 @@ $(document).ready(function() {
     searchSetup(); // check if this is a search page
 
     $.each(HOVER_SEL, function(selector, parser) { //add listeners for each hover selector
-        $(document).on('mouseenter', selector, parser, eventHandler);
+        $(document).on('mouseenter', selector, parser, popupHandler);
+    });
+
+    //try to prefetch results
+    $.each(PREFETCH_SEL, function(selector, parser) {
+        prefetchHandler(selector, parser);
     });
 });
