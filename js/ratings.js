@@ -9,7 +9,7 @@
 var IMDB_API = "http://www.omdbapi.com/?tomatoes=true";
 var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
-var B3_LINK = "http://netflix.burtonthird.com/track";
+var B3_LINK = "http://netflix.burtonthird.com/count";
 
 //popup movie selectors
 var HOVER_SEL = {
