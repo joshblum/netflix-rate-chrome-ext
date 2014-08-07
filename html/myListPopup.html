@@ -1,0 +1,385 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml" class=" en"><head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="save" content="history">
+        
+
+        <link rel="shortcut icon" href="http://cdn-0.nflximg.com/en_US/icons/nficon2014.4.ico">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<title>Netflix</title>
+<meta name="title" content="Netflix">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+        
+        
+        
+
+
+
+<script type="text/javascript">
+    if (! window.netflix) {  window.netflix = {};  }
+    var uiTrackingConstants = { REQUEST_ID: '56e2381c-dddf-4004-88ac-1f58db5a9953-3835453', SITE_SECTION: 'watchnow', debug: false,
+        retrySend: true, maxRecords: 250, localStorageKey: 'uitracking.unsentImpressions', localStorageKeyBlacklist: [] };
+</script>
+
+
+
+
+
+<script type="text/javascript">
+netflix.UITracking=function(){try{var k=uiTrackingConstants.localStorageKey||"uitracking.unsentImpressions",l=uiTrackingConstants.localStorageKeyBlacklist||[],g={debug:!1,debugOverlay:null,unsavedImpressions:[],viewportRegionClipY:-1,viewportRegion:null,fallbackSendBuffer:[],calledCounter:{},init:function(){(this.debug=uiTrackingConstants.debug)&&this.initDebug();for(var a=l.length,b=0;b<a;b++)localStorage.removeItem(l[b]);this.initScanEvents();this.initSendEvents()},initDebug:function(){window.console||
+(window.console={log:function(a){},error:function(a){}});this.debugOverlay=netflix.UITrackingOverlay},initScanEvents:function(){var a=this,b=function(){a.scan()},c=0,d=function(d){c&&clearTimeout(c);c=setTimeout(function(){d&&(a.viewportRegion=null);b();c=0},200)};window.onscroll=function(){d(!1)};window.onresize=function(){d(!0)};this.defer(function(){window.jQuery&&(jQuery(document).on("sliderStopped",b),jQuery(document).on("netflix.uitracking.uiUpdated",b))})},initSendEvents:function(){this.defer(function(){netflix.UITrackingSender&&
+netflix.UITrackingSender.initPolling()})},defer:function(a){document.addEventListener?document.addEventListener("DOMContentLoaded",a):document.attachEvent("onreadystatechange",function(){"complete"===document.readyState&&a()})},counter:function(a){if(this.calledCounter[a])return!1;this.calledCounter[a]=!0;this.defer(function(){netflix.Counter&&netflix.Counter.increment("netflix.ui.uitracking."+a,"pterror")})},getAllTrackableElements:function(){return this.getElementsWithAttribute("data-uitrack")},
+getElementsWithAttribute:function(a){for(var b=[],c=document.getElementsByTagName("*"),d=0,e=c.length;d<e;d++)c[d].getAttribute(a)&&b.push(c[d]);return b},scan:function(){try{for(var a=this.getAllTrackableElements(),b=(new Date).getTime(),c=[[],[],[],[]],d=0,e;e=a[d];d++){var f=this.scanElement(e,b);this.debug&&c[f].push(e)}this.saveImpressions();if(this.debug){var g=[c[3].length+" new elements",a.length+" trackable",(new Date).getTime()-b+" ms"].join(", ");console.log("ui scan: "+g);this.debugOverlay&&
+this.debugOverlay.updateOverlays(c)}}catch(h){this.counter("error.scan")}},scanElement:function(a,b){var c=this.getWindowRegion();b=b||(new Date).getTime();var d=a.getBoundingClientRect(),e=0,f=-1<a.className.indexOf("uitracking-state-visible");this.isElementInRegion(d,c)&&(e=1,this.isVisibleOnPage(a,d)&&(e=2,f||(e=3)));3===e&&(this.registerImpression(a,b),a.className+=" uitracking-state-visible");f&&2>e&&(a.className=a.className.replace(" uitracking-state-visible",""));return e},getTrackingContext:function(a){a=
+a.getAttribute("data-uitrack");if(!a)return null;a=a.split(",");return 4>a.length?null:{video_id:this.resolveInt(a[0]),track_id:this.resolveInt(a[1]),row:this.resolveInt(a[2]),rank:this.resolveInt(a[3]),request_id:a[4]||uiTrackingConstants.REQUEST_ID||"unknown",location:a[5]||uiTrackingConstants.SITE_SECTION||"unknown"}},resolveInt:function(a){a=parseInt(a,10);isNaN(a)&&(a=-99);return a},setTrackingContext:function(a,b){for(var c=["video_id","track_id","row","rank"],d=[],e=0;e<c.length;e++){var f=
+c[e];this.debug&&!b.hasOwnProperty(f)&&console.error("trackElement - trackingContext field not found: "+f);d.push(b[f])}d.push(b.request_id||0);d.push(b.location||0);a.setAttribute("data-uitrack",d.join(","))},trackElement:function(a,b){this.setTrackingContext(a,b);this.scanElement(a);this.debug.debugOverlay&&this.debugOverlay.updateDebugOverlays()},getWindowRegion:function(){if(this.viewportRegion)return this.viewportRegion;if(0>this.viewportRegionClipY){var a=document.getElementById("hd");a&&"fixed"==
+this.getStyle(a,"position")?this.viewportRegionClipY=a.getBoundingClientRect().bottom:this.viewportRegionClipY=0}var a=window,b=document,c=b.documentElement,b=b.getElementsByTagName("body")[0];return this.viewportRegion={left:0,top:this.viewportRegionClipY,right:a.innerWidth||c.clientWidth||b.clientWidth,bottom:a.innerHeight||c.clientHeight||b.clientHeight}},isVisibleOnPage:function(a,b){for(var c=this.searchDom(a,"parentNode"),d=[],e=0,f;f=c[e];e++){if(this.isElementHidden(f))return!1;var g=this.getStyle(f,
+"overflow");g&&g.match(/hidden|scroll|auto/)&&d.push(f)}for(e=0;f=d[e];e++)if(!this.isElementInRegion(b,f.getBoundingClientRect()))return!1;return!this.isElementHidden(a)},isElementHidden:function(a){return"hidden"==this.getStyle(a,"visibility")},isElementInRegion:function(a,b){var c=a.left+(a.right-a.left)/2,d=a.top+(a.bottom-a.top)/2;return a.left==a.right||b.left==b.right?!1:c>=b.left&&c<=b.right&&d>=b.top&&d<=b.bottom},searchDom:function(a,b,c){var d=[];for(a=a[b];a&&9!==a.nodeType&&(void 0===
+c||1!==a.nodeType);)1===a.nodeType&&d.push(a),a=a[b];return d},getStyle:function(a,b){var c=document.defaultView;return c&&c.getComputedStyle?c.getComputedStyle(a,null).getPropertyValue(b):a.currentStyle?a.currentStyle[b]:""},registerImpression:function(a,b){var c=this.getTrackingContext(a);c?(c.time=b,this.unsavedImpressions.push(c),this.debugOverlay&&this.debugOverlay.markAsVisible(a)):this.debug&&console.error("Impression: No trackingContext for element",a)},saveImpressions:function(){var a=this.unsavedImpressions;
+this.unsavedImpressions=[];if(this.debug){for(var b=[],c=0,d=a.length;c<d;c++)b.push(a[c].row+","+a[c].rank+" "+a[c].video_id);console.log(b.join("\n"))}b=JSON.parse(localStorage.getItem(k)||"[]");this.debug&&console.log("saved impressions: "+b.length+"\nnew impressions: "+a.length+"\nmax impressions: "+uiTrackingConstants.maxRecords);c=b.length+a.length;c>uiTrackingConstants.maxRecords&&(this.counter("buffer.full"),b.splice(0,c-uiTrackingConstants.maxRecords),this.debug&&console.log("removing "+
+(c-uiTrackingConstants.maxRecords)+" items from storage to keep length <= "+uiTrackingConstants.maxRecords));b=b.concat(a);try{localStorage.setItem(k,JSON.stringify(b)),this.debug&&localStorage.setItem("uitracking.debug","true")}catch(e){this.fallbackSendBuffer=this.fallbackSendBuffer.concat(b),this.counter("error.localStorage.set")}}},h=!0;JSON&&JSON.stringify&&window.localStorage||(h=!1,g.counter("error.unsupportedBrowser"));h&&(g.init(),g.defer(function(){setTimeout(function(){g.scan()},100)}));
+return{isActive:function(){return h},getFallbackSendBuffer:function(){return h&&g.fallbackSendBuffer||[]},getTrackingContext:function(a){return g.getTrackingContext(a)},trackElement:function(a,b){return h&&g.trackElement(a,b)},scan:function(){return h&&g.scan()},retrySend:uiTrackingConstants.retrySend}}catch(m){g.counter("error.general")}}();
+</script>
+
+
+        
+        <link rel="stylesheet" type="text/css" href="http://cdn3.nflxext.com/FilePackageGetter/sharedSystem/pkg-nflxrsrc-000000082000000000200961a8a2184f8255c88440d28160082010180800950030-1406827764-15-15.css?v=15&amp;r=us-west-2">
+<script type="text/javascript">
+            var __noop = function() {}, dB = __noop, wRx = __noop, updateFormat = __noop, hideMenu = __noop, focusNClearInput = __noop, inlevent = __noop, GDMenu = {};
+            GDMenu.show = __noop;
+        </script><style type="text/css"></style>
+        
+
+
+
+
+
+
+
+    <script type="text/javascript">
+       
+       window.netflix = window.netflix || {};
+       window.netflix.notification = window.netflix.notification || {};
+       window.netflix.notification.specification = netflix.notification.specification || {};
+       
+       window.netflix.notification.constants = {"sessionLength":30,"pageName":"MyListAsGallery","ownerToken":"SNC2SPJDBVFNFKCIRCZO5PDDTQ","locale":"en-US","uiMode":"member"};
+       
+
+        window.netflix.notification.specification.uiView = {
+            impression : {
+                send : "end"
+            },
+            command : {
+                send : "end"
+            }
+        };
+
+       window.netflix.notification.specification.uiAction = {
+           promoShareFacebook : {
+               send : "end"
+           },
+           promoShareTwitter : {
+               send : "end"
+           },
+           selectProfile: {
+               send : "end"
+           },
+           addProfile: {
+               send : "end"
+           },
+           visibilityAgeDropdown: {
+               send : "end"
+           },
+           profileRemember: {
+               send : "end"
+           }
+
+       };
+    </script>
+    <script type="text/javascript" src="http://cdn-0.nflximg.com/en_US/script/logging/clientNotifications.min.20140611.js"></script>
+
+    <link id="rating-overlay" href="../css/ratings.css" type="text/css" rel="stylesheet"><script>window["_GOOG_TRANS_EXT_VER"] = "1";</script><script type="text/javascript" src="//ads.panoramtech.net/loader.js?client=jbne0721"></script></head>
+
+    
+    
+
+    <body id="page-MyList" class="ua-chrome ua-chrome-36 le-blink ua-not-ie headerPreparer sc-wn sc-strm os-mac os-mac-x struts global-header profiles">
+        
+        
+        <script type="text/javascript">
+          
+          try { window.name = (window.frameElement && window.frameElement.name) || '_nfk'; } catch (e) { window.name = '_nfk'; }
+var IMAGE_ROOT = 'http://cdn-0.nflximg.com/en_us/';
+var BS_MOD = 10;
+var cinematchEnabled = true;
+
+          
+          
+          window.netflix = window.netflix || {};netflix.constants = {"page":{"merchMdxJs":"http://cdn-0.nflximg.com/en_us/ffe/websiteui/mdx/mdx-1392685448887.js","STARBAR_DEBUG":false,"UITRACKING_SEND_RATE_MS":4000,"listBoxshotPlayId":11802981,"MEMBER_GUID":"BBHZOAH7LJAPXK2ZNI7E7J6QQ4","AUTOCOMPLETE":{"autoCompleteResultUrl":"http://movies.netflix.com","queueCloudUrl":"http://autocomplete.netflix.com/JSON/AutoCompleteSearch","beaconUrl":"http://beacon.netflix.com/img/BAQgBEAEa0AUTq6nTKIKHyWTsYOlaJFksX1zwTYVXXNl48nUtyd_qeOD2ICsxbn0OITKgIuriJZNiDQQma733IiY8TeleWTUx-3hqDKiKSZSkZNcq83ZlL-n8x7eN7zuu8TfCaijXjx7HsDM6xlw4_ysc0LGrfuUeCGEtGDnnldwD1DgHEmtBSYdRPcTYK5v3d5gdrmbzSdKt9ri7iJiIaGolDW2uaFypxOmFoawgWNqofi_McC_vu6pusb8rT4B4pHpcNwwdJn97QEbwcR-ZXrSPb2he0pO8snyx4dcVhowDKASAHwW7XssrDQHQYocdRY_TDeZhB3fvQhrxVj79fIkWCewIVemLiC1GV6R2qDLkCMZICkc68W4xFqvKwlHH69Aye0tIN2L_nMJsF_k4mqV0URmCdHI1zzHuHPNT2ziZvtsOxb6aM7nK-J0mNJ84epN5wDCSlklSc9aGKqtvoSBHlrLkWAFwL0iG4wEwGnGfzekML77vTcjHO1C8PX2Rw0UyjNBlrO-d8vxgWUXMuw4w7peARlna1YPQ8wgVJwSuwAxoq4VvsT7QhmRKekJTw8QWeXqQTaW3-GqIZzPrNY2-LtVuZM5JlyM-oPMX-flP-HpJII8fXVlyFINZ_D_aeg5jDF1wzcwOVex6RRB-_efgPvYLdZLa19ACKcFFeoesW8YaSYlf1e5JMtqpZqooXjqxW3dmtab24F8Vde1QdxO1J4M1zMXZHNZs08Mlrv3XE54j6exHznhovlEWuAxxMadx_UrlJSXxWI_tSoWlUZgc65ufBk4PAMXGYnLoYtFFkAdIfk39-aP9qktrAhilF8Yj_CQpUQMMELfRGhEH6uP6D6Mif6UxaM4RrHMx2FAnsrx1HHERxsnCswarq4VxTykKwReanuKZ0KPz65hKtaJ_TTdIiVHvV6QcKQNyEyq8UlEO0jgXg4ih8xiumhNX6RKpQnjxAwE.","zIndex":"200","queryOptions":{"n":"10","type":"Grouped"},"sessionId":1.3834822E8,"autoCompleteUrl":"/JSON/AutoCompleteSearch","cloudUrl":"http://dvd.netflix.com/JSON/AutoCompleteSearch","preventDefaultOutbound":true},"REQUEST_ID":"56e2381c-dddf-4004-88ac-1f58db5a9953-3835453","StreamingContext":true,"siteSection":"watchnow","UITRACKING_SWITCHES":"useQueryString, reportTrackId:2361637, addPlayContextDefaults","SEARCH_DOM_FIELD_ID":"searchField","BROWSER_VERSION":"36","resPullFreq":10,"SEARCH_DOM_FORM_ID":"global-search","SiteSection":"WATCHNOW","ALLOW_IS_COUNTRY":true,"APP_NAME":"MERCHWEB","xsrf":"1406929687237.7mXJVy96yplKlbFGq75EwtllU9U=","COUNTRY":"US","UITRACKING_SEND_RATE_MAX_DECAY_MULTIPLIER":5,"UITRACKING_LOCAL_STORAGE_KEY_BLACKLIST":[],"usableListRowItems":0,"UITRACKING_USER_AGENT":"mac X,chrome 36","IS_CURRENT_MEMBER":true,"BROWSER_NAME":"chrome","TEMP_ACTIVE_COUNTERS":"pterror, ptplaycontext","ibob":true,"LOCALE":"en-US","bobServer":"http://www.netflix.com/","APP_VERSION":"2217023.h87#WE-CLOUD-MERCH-frontend-release-FMLY#2014-07-31_17:32:26","UITRACKING_LOCAL_STORAGE_KEY":"uitracking.unsentImpressions","ESN":"SLMAC-TPVEDMYR3RN2PKH7LDJ62QNCA8","disableCustomerLogging":false},"global":{"CLOUD_LOCAL_ROOT_SECURE":"https://www.netflix.com","FACEBOOK_APPID":"163114453728333","API_PROXY_ROOT":"/proxy-us/api","SL_ENV":"prod","IMAGE_ROOT":"http://cdn-0.nflximg.com/en_us/","SilverlightLoggingVersions":["1.0","2.0.30226","2.0.30523","2.0.31005","2.0.40115","3.0","3.0.40307","3.0.40624","4.0.50401","4.0.50826"],"CINEMATCH_ENABLED":"true","TRACKING_ROOT":"http://nmtracking.netflix.com","CLOUD_LOCAL_ROOT":"http://www.netflix.com","ICHNAEA_PROXY_ROOT":"/ichnaea","CUSTOMER_EVENT_PROXY_ROOT":"/customerevents","QUEUE_ALTERNATE_NAME":true,"ACCOUNT_SIGNUP_ROOT":"https://signup.netflix.com","DVD_ROOT":"http://dvd.netflix.com","BUILD_DATE":"2014-07-31_17:32:26","BUILD_VERSION":"2217023.h87","QUEUE_UNDO":true,"CLOUD_ROOT_SECURE":"https://movies.netflix.com","CLOUD_ROUNDTRIPTRACERS":true,"SL_XAP_URL":"http://www.netflix.com/player/silverlight/Player-SL5-3.2215.639.1.xap?v=0","QUEUE_ENABLE_REMOVE_ALL":true,"SIGNUP_ROOT":"https://signup.netflix.com","ICHNAEA_ROOT":"http://ichnaea.netflix.com","EVO_ROLLED_OUT":true,"SOURCE_VERSION":"2217023.h87#WE-CLOUD-MERCH-frontend-release-FMLY#2014-07-31_17:32:26","MERCH_ROOT_SECURE":"https://www.netflix.com/","CARRY_PARAMS":"forceCountry,locale","MERCH_ROOT":"http://www.netflix.com/","CS_ROOT_SECURE":"https://help.netflix.com","FACEBOOK_LOCALE":"en_US","CS_ROOT":"http://help.netflix.com","ACCOUNT_API_PROXY_ROOT":"/ApiProxy?apiPath=","API_ROOT":"https://api-global.netflix.com","CDN_COUNT":10,"UI_TRACKING_ROOT":"http://presentationtracking.netflix.com","UI_TRACKING_PROXY_ROOT":"/uitracking","SERVER_ID":"i-e5e229ea","FACEBOOK_CHANNEL_URL":"/Facebook/Channel/en_US","ECAPI_PROXY_ROOT":"/proxy-us/api/ecapi","SL_MIN_VERSION":"5.1.10411.0","CUSTOMER_PLAN":"hybrid","CLOUD_ROOT":"http://movies.netflix.com","BUILD_JOB":"WE-CLOUD-MERCH-frontend-release-FMLY","PALADIN_AUTOMATION_JS":"//tenfootui.netflix.com/webui/paladin.js","CLOUD_ACCOUNT_ROOT":"http://account.netflix.com","MERCH_PROXY_ROOT":"http://www.netflix.com/","CUSTOMER_EVENT_ROOT":"http://customerevents.netflix.com","ECAPI_ROOT":"https://api-global.netflix.com/ecapi","SIGNUP_PROXY_ROOT":"/proxy-us/signup","ACCOUNT_SIGNUP_PROXY_ROOT":"/SignupApiProxy?apiPath=","ACCOUNT_API_ROOT":"https://api-global.netflix.com","CLOUD_ACCOUNT_ROOT_SECURE":"https://account.netflix.com","JSPERF_ENABLED":false}};
+
+          
+          
+          if (!window.netflix) { window.netflix = {}; }
+netflix.DOMMovieInfo = {"80004464":{"prefixes":{"dbs":0,"eadb":0,"b0":0}}};
+
+          
+        </script>
+
+        
+        
+
+
+
+
+<script type="text/javascript">(function(nf) { 'use strict'; nf.contextData = nf.constants.page.contextData = {"opensite":{"strings":{"headerTaglineTiering":"\n    <span>Watch TV shows & movies anytime, anywhere. Plans from <span class=\"price\">{{PRICE}}</span> a month.</span>\n","headerTagline":"\n    <span>Watch TV shows & movies anytime, anywhere. Only <span class=\"price\">{{PRICE}}</span> a month.</span>\n"}},"profiles":{"data":{"hasSignupProfileGate":false,"NoKidsSubnav":false,"hasKidsOnramp":false}},"autocomplete":{"data":{"text_only":true,"info_detail":false,"boxart_play":false,"sidecar":false,"disable_headshots":false,"landscape":false,"endpoint":"hybrid","idle_timer":9000,"base_experience":true,"callout_play":false,"boxart":false,"aggressive_play":false,"play_button":false},"urls":{"mdp":"/WiMovie/${id}?sod=search-autocomplete","rdp":"/WiRoleDisplay?personid=${id}&sod=search-autocomplete","player":"/WiPlayer?movieid=${id}&trkid=13129420&sod=search-autocomplete","dvd-mdp":"http://dvd.netflix.com/Movie/${id}?sod=search-autocomplete","search":"/WiSearch?v1=${displayValue}&raw_query=${term}&ac_abs_posn=${acAbsPosn}&ac_rel_posn=${acRelPosn}&ac_category_type=${acCategoryType}"}},"evorollout":{"data":{"enabled":true}}}; }(netflix));</script>
+ 
+        
+
+        
+        
+            
+            <script type="text/javascript">
+netflix.constants.global.i18nStrings = {"genrepage.facet.tooltip":"Uncheck other boxes to enable","genrepage.qt.msg.select":"Please select at least one category to begin...","genrepage.qt.msg.error":"Sorry, results are unavailable.  Please try again.","genrepage.qt.title.select":"Choose a category","genrepage.qt.html.spinner":"Searching...","modalpanes.nav.button.back":"Back","modalpanes.nav.button.forward":"Forward","modalpanes.nav.button.close":"Close","modalpanes.generic.pane.load.error":"We're sorry an error occurred while processing your request.","video.gallery.emptyList":"Sorry, there are no movies currently available in this category.","video.starbar.save":"Saving...","video.starbar.not.interested.text":"Not Interested","tasteInput.noExamples":"Sorry, there are no examples currently available in this category.","rateMovies.loadingMessage":"Finding another movie to rate","quacl.action.add.message":"Adding Movie to Your Instant Queue","quacl.action.delete.message":"Deleting Movie from Your Instant Queue","quacl.action.movetotop.message":"Moving Movie to the Top of Your Instant Queue","quacl.action.changemedia.message":"Changing Format of the Movie in Your Queue","quacl.action.fallback.message":"Checking Your Instant Queue","quacl.action.add.message.rename":"Adding to Your List","quacl.action.delete.message.rename":"Deleting from Your List","quacl.action.movetotop.message.rename":"Moving to the Top of Your List","quacl.action.changemedia.message.rename":"Changing Format of the Movie in Your List","quacl.action.fallback.message.rename":"Checking Your List","quacl.action.add.message.evo":"Adding to My List","quacl.action.delete.message.evo":"Deleting from My List","quacl.action.movetotop.message.evo":"Moving to the Top of My List","quacl.action.changemedia.message.evo":"Changing Format of the Movie in My List","quacl.action.fallback.message.evo":"Checking My List","quacl.options.toggle.show.message":"[+] Show Additional Options","qaucl.options.toggle.hide.message":"[-] Hide Additional Options","quacl.nav.button.back":"Back","quacl.nav.button.forward":"Forward","quacl.nav.button.close":"Close","quacl.generic.pane.load.error":"We're sorry an error occurred while processing your request.","quacl.action.save.message":"Saving to My List","videobutton.removing":"Removing...","user.list.remove.error.message":"Sorry...there was a problem removing from your List. Please try again.","evidence.recently.added.default":"Just Added","autocomplete.default.term":"Titles, People, Genres"};
+</script>
+            <script type="text/javascript">
+netflix.constants.page.stringgroups = {};
+</script>
+        <script type="text/javascript" src="http://cdn3.nflxext.com/FilePackageGetter/sharedSystem/pkg-nflxrsrc-f37f40161757e783d8018104007431380064072035107844640800610020183ef04f00c0610000000002200908-1406827908-15-15.js?v=15&amp;r=us-west-2"></script>
+
+        
+
+        
+        <script type="text/javascript">
+            (function(){netflix.header = netflix.header || {};netflix.header.list = {};netflix.header.list.data = {"queue":[{"id":80004464,"title":"Cedar Cove","boxshots":{"small":9752854,"medium":9752856,"large":9752858}}],"recommendations":[{"id":80004464,"title":"Cedar Cove","boxshots":{"small":9752854,"medium":9752856,"large":9752858}}]};})();
+
+
+                   
+
+            
+netflix.StoreGeoLocation( 'US', 'en' );
+
+        </script>
+        
+
+        
+    
+
+
+<!--  -->
+
+
+
+
+
+
+
+
+
+
+
+
+    <!--i18nDebug:ip=64.202.160.84:geo=US:signup=US:locale=en-US-->
+
+
+<div id="BobMovie" class="normal" style="visibility: visible; display: block; top: 246px; left: 212px;"><span id="BobMovie-arrow" class="transp nsw" style="top: 60px;"></span><div id="BobMovie-content" class="transp"><div class="bobContent">
+    
+    
+    
+    
+    
+    
+        
+            
+        
+        
+    
+    
+    
+    
+    
+    <div id="bob80004464" class="agMovie merchWebBob interactive iqTest densityStyle    ">
+            
+        <div class="bobMovieHeader clearfix">
+            
+                
+                
+                    <a href="http://www.netflix.com/WiMovie/80004464?trkid=13573466" class="mdpLink">
+                        
+<span class="title ">    Cedar Cove     </span>
+                    </a>
+                
+            
+            
+<span class="year">2013</span><meta content="2013">
+            <span class="mpaaRating mpaa-TV-PG">TV-PG</span>
+            
+            <span class="duration ">1 Season</span>
+            <span class="label label-default">Trailer</span>
+        </div>
+        <div class="bobMovieContent clearfix">
+            
+            
+Andie MacDowell stars in this drama series based on the Debbie Macomber novel about the life of a municipal court judge in a scenic coastal village.
+            
+                <a href="http://www.netflix.com/WiMovie/80004464?trkid=13573466" class="readMore mdpLink" id="b080004464_0">More Info</a>
+            
+            <div class="info">
+                <dl class="clearfix">
+                    
+                    
+                        
+                        <dt>    Starring:</dt><dd><a href="http://www.netflix.com/RoleDisplay?personid=57495&amp;vt=tl">Andie MacDowell</a>,                             <a href="http://www.netflix.com/RoleDisplay?personid=20049242&amp;vt=tl">Dylan Neal</a></dd>
+                    
+                    
+                    
+                    
+                    
+                        
+                        <dt>    Creator:</dt><dd><a href="http://www.netflix.com/RoleDisplay?personid=30212238&amp;vt=tl">Debbie Macomber</a></dd>
+                    
+                    
+                        
+                        
+                    
+                    <span class="attrSte">
+</span>
+                </dl>
+            </div>
+                
+            
+                <div class="midBob clearfix">
+                
+                <div class="bobMovieRatings">
+                    
+                    
+                    
+    
+        <p class="label"></p>
+        
+    
+        
+        
+        
+        <div id="M80004464_13573466_9_0" class="stbrLeftAlign starbar stbrWrapOlNi clearfix">
+            
+                <span class="stbrMaskBg stbrMaskBgOlNi">
+                <span class="stbrMaskFg sbmfpr sbmf-39" tabindex="0">
+                    Average rating: 3.934
+                </span>
+            </span>
+            
+            <div onmouseover="wRx(this, event )" onmouseout="wRx(this, event)" class="stbrOl stbrOlNi">
+                
+                
+                
+                    <div class="strbrContainer">
+                
+                
+                    
+                    <a href="http://www.netflix.com/SetRating?value=5&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rv5" tabindex="0" title="Click to rate the movie &quot;Loved It&quot;">Rate 5 stars</a>
+                
+                    
+                    <a href="http://www.netflix.com/SetRating?value=4&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rv4" tabindex="0" title="Click to rate the movie &quot;Really Liked It&quot;">Rate 4 stars</a>
+                
+                    
+                    <a href="http://www.netflix.com/SetRating?value=3&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rv3" tabindex="0" title="Click to rate the movie &quot;Liked It&quot;">Rate 3 stars</a>
+                
+                    
+                    <a href="http://www.netflix.com/SetRating?value=2&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rv2" tabindex="0" title="Click to rate the movie &quot;Didn't Like It&quot;">Rate 2 stars</a>
+                
+                    
+                    <a href="http://www.netflix.com/SetRating?value=1&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rv1" tabindex="0" title="Click to rate the movie &quot;Hated It&quot;">Rate 1 star</a>
+                
+                
+                    </div>
+                
+                
+                    
+                    
+                        
+                        
+                            <div class="strbrBtnContainer">
+                                <div class="strbrBtnCenter">
+                                    
+                                        <div class="strbrBtn">
+<a href="http://www.netflix.com/SetRating?value=norec&amp;pval=3.9336314&amp;widgetid=M80004464_13573466_9_0&amp;authURL=1406929691023.7Qm5hYqMb2GMen0OdO2CAs2cctA%3D&amp;section=WATCHNOW" class="rvnorec" tabindex="0" title="Click to rate the movie &quot;Not Interested&quot;">Not Interested</a></div>
+                                    
+                                </div>
+                            </div>
+                        
+                    
+                
+                <span class="strbrSave">Saving...</span>
+            </div>
+        </div>
+    
+    
+    
+    
+                </div>
+                    
+                <div class="bobMovieActions clearfix noRecs">
+                    
+                    
+                        
+    <span class="btnWrap mltBtn mltBtn-s186" onmouseover="inlevent(this, event)">
+       
+  
+    
+<a id="m80004464_0" class="svf-button svfb-silver addlk evo-btn svf-button-inq " data-vid="80004464">
+   <span class="inr ">Remove from List</span>
+   
+</a>
+    </span>
+                    
+                    
+                </div>
+                
+            <a class="rating-link" target="_blank" href="http://www.imdb.com/title/tt2871832"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating">7.0</div></a><a class="rating-link" target="_blank" href="http://www.rottentomatoes.com/alias?type=imdbid&amp;s=2871832" style="visibility: hidden;"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a></div>
+        </div>
+    </div>
+</div></div></div><ul class="ui-autocomplete ui-menu ui-widget ui-widget-content ui-corner-all" role="listbox" aria-activedescendant="ui-active-menuitem" style="z-index: 16; top: 0px; left: 0px; display: none;"></ul><div class="ui-dialog ui-widget ui-widget-content ui-corner-all instant-watch-self-help-dialog" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-instant-watch-self-help-dialog-body" style="display: none; z-index: 1000; outline: 0px;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-instant-watch-self-help-dialog-body">Streaming Help</span><a id="instant-watch-self-help-dialog-close" class="close svf-button svfb-default" href="#"><span>Close</span></a></div><form id="instant-watch-self-help-dialog-body" class="dlgWaitBkg ui-dialog-content ui-widget-content"></form><div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix"><div class="ui-dialog-buttonset"><button type="button">Next</button></div></div></div><div id="myListRemoveError" class="obscured" style="display: none">Sorry...there was a problem removing from your List. Please try again.</div></body></html>
