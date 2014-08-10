@@ -40,3 +40,4 @@ Author
 Contributions
 --------
 + <a href="http://thenounproject.com/noun/share/#icon-No3893" target="_blank">Share</a> designed by <a href="http://thenounproject.com/planemad" target="_blank">Share Icon Project</a> from The Noun Project
++ Video designed by <a href="http://www.thenounproject.com/SimpleIcons">Simple Icons</a> from the <a href="http://www.thenounproject.com">Noun Project</a>

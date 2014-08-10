@@ -1,18 +1,14 @@
-// s (NEW!)  string (optional)   title of a movie to search for
-// if (!cached.inCache) return; // we need the type!
-// i     string (optional)   a valid IMDb movie id
-// t     string (optional)   title of a movie to return
-// y     year (optional)     year of the movie
-// r     JSON, XML   response data type (JSON default)
-// plot  short, full     short or extended plot (short default)
-// callback  name (optional)     JSONP callback name
-// tomatoes  true (optional)     adds rotten tomatoes data
 var TMDB_API_KEY = "04a87a053afac639272eefbb94a173e4";
+var MASHAPE_API_KEY = "o8ExDmFGA5mshpeqIsuOzl2MVcpUp10vM6njsnscSkr7IMivH4";
+
 var IMDB_API = "http://www.omdbapi.com/?tomatoes=true";
 var TMDB_API = "http://api.themoviedb.org/3";
+var MASHAPE_API = "https://byroredux-metacritic.p.mashape.com/search/movie";
+
 var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 var B3_LINK = "http://netflix.burtonthird.com/count";
+var YOUTUBE_TRAILER_LINK = "https://www.youtube.com/watch?v=";
 
 //popup movie selectors
 var HOVER_SEL = {
@@ -45,6 +41,7 @@ function parseAPIResponse(res, default_res) {
         return default_res;
     }
 }
+
 /*
     Builds a select object where the selector is used to insert the ratings via the given insertFunc. Interval specifies the interval necessary for the popupDelay. imdb and rt classes are extra classes that can be added to a rating.
 */
@@ -114,11 +111,13 @@ function getTrailerDvdArgs(args, url) {
 /*
     Add rating to the cache
 */
-function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year, type) {
+function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, metacriticScore, metacriticUrl, year, type) {
     imdb = imdb || null;
     tomatoMeter = tomatoMeter || null;
     tomatoUserMeter = tomatoUserMeter || null;
     imdbID = imdbID || null;
+    metacriticScore = metacriticScore || null;
+    metacriticUrl = metacriticUrl || null;
     year = year || null;
     type = type || null;
 
@@ -129,6 +128,8 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year, type)
         'tomatoMeter': tomatoMeter,
         'tomatoUserMeter': tomatoUserMeter,
         'imdbID': imdbID,
+        'metacriticScore': metacriticScore,
+        'metacriticUrl': metacriticUrl,
         'year': year,
         'date': date,
         'type': type,
@@ -141,17 +142,42 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, year, type)
 /*
  * Add a trailer to cache
  */
-function addTrailerCache(title, trailer_id) {
-    trailer_id = trailer_id || null;
+function addTrailerCache(title, trailerId) {
+    trailerId = trailerId || null;
     var cachedVal = JSON.parse(CACHE[title]);
 
     if (cachedVal === undefined) {
         cachedVal = {
             'title': title,
-            'trailer_id': trailer_id,
+            'trailerId': trailerId,
         };
     } else {
-        cachedVal.trailer_id = trailer_id;
+        cachedVal.trailerId = trailerId;
+    }
+
+    CACHE.date = new Date().getTime();
+    CACHE[title] = JSON.stringify(cachedVal);
+    return cachedVal;
+}
+
+/*
+ * Add metacritic score to cache
+ */
+function addMetacriticCache(title, metacriticScore, metacriticUrl) {
+    metacriticScore = metacriticScore || null;
+    metacriticUrl = metacriticUrl || null;
+
+    var cachedVal = JSON.parse(CACHE[title]);
+
+    if (cachedVal === undefined) {
+        cachedVal = {
+            'title': title,
+            'metacriticScore': metacriticScore,
+            'metacriticUrl': metacriticUrl,
+        };
+    } else {
+        cachedVal.metacriticScore = metacriticScore;
+        cachedVal.metacriticUrl = metacriticUrl;
     }
 
     CACHE.date = new Date().getTime();
@@ -171,7 +197,7 @@ function checkCache(title) {
 
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
-    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.year !== null) {
+    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.metacriticScore !== undefined && cachedVal.year !== null) {
         inCache = isValidCacheEntry(cachedVal.date);
     }
     return {
@@ -225,6 +251,14 @@ function clearOld(type, args) {
 
 function getTomatoClass(score) {
     return score < 59 ? 'rotten' : 'fresh';
+}
+
+function getMetacriticClass(score) {
+    var klass;
+    if (score > 60) klass = 'favorable';
+    else if (score > 40) klass = 'average';
+    else klass = 'unfavorable';
+    return 'metacritic-' + klass;
 }
 
 
@@ -312,8 +346,16 @@ function appendTMDBAPIKey(url) {
     return url + "?api_key=" + TMDB_API_KEY;
 }
 
-function getYouTubeTrailerLink(trailer_id) {
-    return "https://www.youtube.com/watch?v=" + trailer_id;
+function getYouTubeTrailerLink(trailerId) {
+    return YOUTUBE_TRAILER_LINK + trailerId;
+}
+
+/*
+ * MASHAPE API url
+ */
+
+function getMashapeAPIUrl() {
+    return MASHAPE_API;
 }
 
 
@@ -584,23 +626,55 @@ function getRating(title, year, addArgs, callback) {
         }
         return;
     }
-    $.get(getIMDBAPI(title, year), function(res) {
-        res = parseAPIResponse(res, {
+    $.get(getIMDBAPI(title, year), function(omdbRes) {
+        omdbRes = parseAPIResponse(omdbRes, {
             'Response': 'False',
         });
 
-        if (res.Response === 'False') {
-            addCache(title);
-            return null;
-        }
-        var imdbScore = parseFloat(res.imdbRating);
-        var tomatoMeter = getTomatoScore(res, "tomatoMeter");
-        var tomatoUserMeter = getTomatoScore(res, "tomatoUserMeter");
-        var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter, res.imdbID, year, res.Type);
-        if (callback) {
-            callback(rating, addArgs);
-        }
+        $.post(getMashapeAPIUrl(), {
+            'title': title,
+        }, function(metaRes) {
+            //search based on year and convert to single result
+            if (metaRes.count === 0) {
+                metaRes = {
+                    'result': false,
+                };
+            } else {
+                var res;
+                var metaYear;
+                for (i = 0; i < metaRes.count; i++) {
+                    res = metaRes.results[i];
+                    metaYear = res.rlsdate.split('-')[0];
+                    if (year === parseInt(metaYear)) {
+                        metaRes = res;
+                        break;
+                    }
+                }
+                if (year === null || metaRes.max_pages !== undefined) {
+                    metaRes = metaRes.results[0];
+                }
+            }
+            processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
+        });
+
     });
+}
+
+function processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs) {
+    // both apis failed
+    if (omdbRes.Response === 'False' && metaRes.result === false) {
+        addCache(title);
+        return null;
+    }
+    var imdbScore = parseFloat(omdbRes.imdbRating);
+    var tomatoMeter = getTomatoScore(omdbRes, "tomatoMeter");
+    var tomatoUserMeter = getTomatoScore(omdbRes, "tomatoUserMeter");
+    var metacriticScore = parseInt(metaRes.score);
+    var metacriticUrl = metaRes.url;
+    var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter, omdbRes.imdbID, metacriticScore, metacriticUrl, year, omdbRes.Type);
+    if (callback) {
+        callback(rating, addArgs);
+    }
 }
 
 /*
@@ -667,22 +741,24 @@ function updateCache(title) {
 function displayRating(rating, args) {
     var imdbHtml = getIMDBHtml(rating, args.imdbClass);
     var tomatoHtml = getTomatoHtml(rating, args.rtClass);
+    var metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
     var $target = $(args.selector);
     $target[args.insertFunc](imdbHtml);
     $target[args.insertFunc](tomatoHtml);
+    $target[args.insertFunc](metaHtml);
 }
 
 /*
  * Build and display the trailer
  */
 function displayTrailer(trailer, args) {
-    var trailer_id = trailer.trailer_id;
-    var trailerHtml = getTrailerLabelHtml(trailer_id, args.trailerClass);
+    var trailerId = trailer.trailerId;
+    var trailerHtml = getTrailerLabelHtml(trailerId, args.trailerClass);
     var $target = $(args.selector);
     $target[args.insertFunc](trailerHtml);
-    var $trailer = $('#' + trailer_id);
+    var $trailer = $('#' + trailerId);
     $trailer.popover({
-        'content': getTrailerPlayerHtml(trailer_id),
+        'content': getTrailerPlayerHtml(trailerId),
         'html': true,
         'trigger': 'manual',
         'placement': function(context, source) {
@@ -828,34 +904,39 @@ function getIMDBHtml(rating, klass) {
 }
 
 function getTomatoHtml(rating, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(rating.imdbID)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span><span class="rt-icon audience-icon med"></span><span class="rt-score audience-score"></span></span></a>');
-    if (!rating.tomatoMeter || !rating.tomatoUserMeter) {
-        html.css('visibility', 'hidden');
-        return html;
+    if (!rating.tomatoMeter) {
+        return '<span class="rating-link tomato-filler"></span>';
     }
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(rating.imdbID)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span></span></a>');
 
     html.find('.tomato-icon').addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
     html.find('.tomato-score').append(rating.tomatoMeter + '%');
 
-    html.find('.audience-icon').addClass(getTomatoClass(rating.tomatoUserMeter)).addClass(klass);
-    html.find('.audience-score').append(rating.tomatoUserMeter + '%');
-
     return html;
 }
 
-function getTrailerLabelHtml(trailer_id, klass) {
-    if (trailer_id === null) {
+function getMetatcriticHtml(rating, klass) {
+    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(rating.metacriticUrl) + '"><span class="metascore metacritic-rating" title="MetaCritic Rating">' + rating.metacriticScore + '</span>');
+    html.find('.metacritic-rating').addClass(getMetacriticClass(rating.metacriticScore));
+    if (!rating.metacriticScore) {
+        html.css('visibility', 'hidden');
+    }
+    return html;
+}
+
+function getTrailerLabelHtml(trailerId, klass) {
+    if (trailerId === null) {
         return '';
     }
     klass = klass || '';
-    var html = $("<a target='_blank' id='" + trailer_id + "' class='" + klass + " trailer-label' href='" + getYouTubeTrailerLink(trailer_id) +
+    var html = $("<a target='_blank' id='" + trailerId + "' class='" + klass + " trailer-label' href='" + getYouTubeTrailerLink(trailerId) +
         "'><span class='label label-default'>Trailer</span></a>");
     return html;
 
 }
 
-function getTrailerPlayerHtml(trailer_id, klass) {
-    return '<iframe allowfullscreen="1" type="text/html" width="480" height="292" src="http://www.youtube.com/embed/' + trailer_id + '?autoplay=1" frameborder="0"/>';
+function getTrailerPlayerHtml(trailerId, klass) {
+    return '<iframe allowfullscreen="1" type="text/html" width="480" height="292" src="http://www.youtube.com/embed/' + trailerId + '?autoplay=1" frameborder="0"/>';
 }
 
 
@@ -863,6 +944,7 @@ function getTrailerPlayerHtml(trailer_id, klass) {
     Helper function for escaping API urls
 */
 function escapeHTML(str) {
+    if (str === null) return str;
     return str.replace(/[&"<>]/g, function(m) {
         return {
             "&": "&amp;",
@@ -896,6 +978,11 @@ function deepCopy(object) {
 
 ///////// INIT /////////////
 $(document).ready(function() {
+    $.ajaxSetup({
+        headers: {
+            'X-Mashape-Key': MASHAPE_API_KEY
+        },
+    });
     countUser();
 
     //poup select types
