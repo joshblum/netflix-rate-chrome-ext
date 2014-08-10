@@ -3,7 +3,7 @@ netflix-rate
 
 About
 --------
-A Chrome extension that adds trailers as well as IMDB, Rotten Tomato, and MetaCritic ratings to the Netflix webpage. 
+A Chrome extension that adds trailers, IMDB, Rotten Tomato, and MetaCritic ratings to the Netflix webpage. 
 
 Download directly from the <a href="https://chrome.google.com/webstore/detail/netflix-rate/ecaaapiecdienibfgolcopgnicppkmhn?hl=en" target="_blank">Chrome Web Store</a>.
 
