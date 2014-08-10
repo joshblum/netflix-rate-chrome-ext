@@ -1,4 +1,4 @@
-(function() {
+$(document).ready(function() {
     var save_option = function() {
         chrome.storage.local.set({
             'revjet-optout': !! this.checked
@@ -12,4 +12,4 @@
         document.querySelector('#revjet-optout').addEventListener('change',
             save_option);
     });
-})();
+});
