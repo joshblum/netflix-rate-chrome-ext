@@ -27,9 +27,9 @@ Screenshots
 --------
 
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-movie.png "dvd movie")
+![alt text](http://netflix.burtonthird.com/static/img/screenshots/wi-popup.png "wi popup")
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-popup.png "dvd popup")
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-search.png "dvd search")
-![alt text](http://netflix.burtonthird.com/static/img/screenshots/wi-popup.png "wi popup")
 
 Author
 --------
