@@ -26,10 +26,10 @@ If you wish to download the old version the extension without permissions for op
 Screenshots
 --------
 
-![alt text](http://netflix.burtonthird.com/static/img/screenshots/main-fresh.png "main fresh")
-![alt text](http://netflix.burtonthird.com/static/img/screenshots/search-page.png "search page")
-![alt text](http://netflix.burtonthird.com/static/img/screenshots/queue-rotten.png "queue rotten")
-![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-fresh.png "dvd fresh")
+![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-movie.png "dvd movie")
+![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-popup.png "dvd popup")
+![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-search.png "dvd search")
+![alt text](http://netflix.burtonthird.com/static/img/screenshots/wi-popup.png "wi popup")
 
 Author
 --------
