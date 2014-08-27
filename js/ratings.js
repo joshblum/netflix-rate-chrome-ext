@@ -261,7 +261,6 @@ function getMetacriticClass(score) {
     return 'metacritic-' + klass;
 }
 
-
 ///////////////// URL BUILDERS ////////////////
 
 /*
@@ -502,7 +501,6 @@ function parseSearchTitle($target) {
 function parseMovieTitle($target) {
     return $target.find('.title').text();
 }
-
 
 /////////// RATING HANDLERS ////////////
 
@@ -797,7 +795,6 @@ function displayTrailer(trailer, args) {
     });
 }
 
-
 ////////SEARCH AND INDIVIDUAL PAGE HANDLERS //////////
 /*
     Determine which search, dvd or watch instantly and display the correct ratings
@@ -1048,5 +1045,4 @@ $(document).ready(function() {
             prefetchHandler(selector, parser);
         });
     }
-
 });
