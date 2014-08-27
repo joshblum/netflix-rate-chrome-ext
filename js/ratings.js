@@ -629,30 +629,38 @@ function getRating(title, year, addArgs, callback) {
             'Response': 'False',
         });
 
-        $.post(getMashapeAPIUrl(), {
-            'title': title,
-        }, function(metaRes) {
-            //search based on year and convert to single result
-            if (metaRes.count === 0) {
-                metaRes = {
-                    'result': false,
-                };
-            } else {
-                var res;
-                var metaYear;
-                for (i = 0; i < metaRes.count; i++) {
-                    res = metaRes.results[i];
-                    metaYear = res.rlsdate.split('-')[0];
-                    if (year === parseInt(metaYear)) {
-                        metaRes = res;
-                        break;
+        $.ajax({
+            'type': 'POST',
+            'url': getMashapeAPIUrl(),
+            'data': {
+                'title': title
+            },
+            'headers': {
+                'X-Mashape-Key': MASHAPE_API_KEY
+            },
+            'success': function(metaRes) {
+                //search based on year and convert to single result
+                if (metaRes.count === 0) {
+                    metaRes = {
+                        'result': false,
+                    };
+                } else {
+                    var res;
+                    var metaYear;
+                    for (i = 0; i < metaRes.count; i++) {
+                        res = metaRes.results[i];
+                        metaYear = res.rlsdate.split('-')[0];
+                        if (year === parseInt(metaYear)) {
+                            metaRes = res;
+                            break;
+                        }
+                    }
+                    if (year === null || metaRes.max_pages !== undefined) {
+                        metaRes = metaRes.results[0];
                     }
                 }
-                if (year === null || metaRes.max_pages !== undefined) {
-                    metaRes = metaRes.results[0];
-                }
+                processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
             }
-            processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
         });
 
     });
@@ -975,11 +983,6 @@ function deepCopy(object) {
 
 ///////// INIT /////////////
 $(document).ready(function() {
-    $.ajaxSetup({
-        headers: {
-            'X-Mashape-Key': MASHAPE_API_KEY
-        },
-    });
     countUser();
 
     //poup select types
