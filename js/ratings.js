@@ -243,7 +243,11 @@ function clearOld(type, args) {
     }
     if (type === 'rating') {
         $target.find('.rating-link').remove();
-        $target.find('.ratingPredictor').remove();
+        $target.find('.label').remove();
+        $target.find('.ratingPredictor').css({
+          'visibility': 'hidden',
+          'margin-left': '-20px',
+        });
     } else if (type === 'trailer') {
         $target.find('.trailer-label').remove();
     }
