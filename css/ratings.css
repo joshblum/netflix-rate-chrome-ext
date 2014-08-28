@@ -93,6 +93,14 @@
   font-weight: normal;
 }
 
+.rating-link-tomato {
+  /* margin-left: -45px; */
+}
+
+.rating-link-imdb {
+  margin-left: 67px;
+}
+
 .dvd-popup {
   margin-bottom: -15px;
   margin-top: -29px;
