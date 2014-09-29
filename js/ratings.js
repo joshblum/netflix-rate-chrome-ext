@@ -245,6 +245,7 @@ function clearOld(type, args) {
         $target.find('.rating-link').remove();
         $target.find('.label').remove();
         $target.find('.ratingPredictor').remove();
+        $target.find('.bobMovieActions').remove();
     } else if (type === 'trailer') {
         $target.find('.trailer-label').remove();
     }
