@@ -10,17 +10,6 @@
                 "http://*.netflix.com/*", 
                 "https://*.netflix.com/*"
             ]
-        }, 
-        {
-            "all_frames": false, 
-            "js": [
-                "js/revjet_contentscript.js"
-            ], 
-            "matches": [
-                "http://*/*", 
-                "https://*/*"
-            ], 
-            "run_at": "document_idle"
         }
     ], 
     "description": "Add trailers, IMDB, Rotten Tomato, and MetaCritic ratings to the Netflix webpage.", 
@@ -30,7 +19,6 @@
     }, 
     "manifest_version": 2, 
     "name": "Netflix Rate", 
-    "options_page": "options.html", 
     "permissions": [
         "storage", 
         "http://www.omdbapi.com/*", 
@@ -41,7 +29,7 @@
         "https://byroredux-metacritic.p.mashape.com/"
     ], 
     "short_name": "Netflix Rate", 
-    "version": "1.3.40", 
+    "version": "1.3.41", 
     "web_accessible_resources": [
         "css/ratings.css", 
         "img/imdbSprite.png", 
