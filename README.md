@@ -3,25 +3,13 @@ netflix-rate
 
 About
 --------
-A Chrome extension that adds trailers, IMDB, Rotten Tomato, and MetaCritic ratings to the Netflix webpage. 
+A Chrome extension that adds trailers, IMDB, Rotten Tomato, and MetaCritic ratings to the Netflix webpage.
 
 Download directly from the <a href="https://chrome.google.com/webstore/detail/netflix-rate/ecaaapiecdienibfgolcopgnicppkmhn?hl=en" target="_blank">Chrome Web Store</a>.
 
 <a href="http://netflix.burtonthird.com" target="_blank">Share this extension</a>.
 
 Netflix-rate is available under the [MIT license](http://opensource.org/licenses/MIT).
-
-
-Manual Installation
---------
-If you wish to download the old version the extension without permissions for optional advertisements, here's how.
-
-1. Download the [zip file](https://github.com/joshblum/netflix-rate-chrome-ext/raw/before-ads/chrome-ext.zip)
-1. Extract the zip ([How to open a zip](http://www.wikihow.com/Open-a-.Zip-File-Without-Winzip))
-1. Open Chrome and go to chrome://extensions/
-1. Drag the folder into the Chrome browser window (you'll see "Install" appear on hover)
-1. Contact [netflix-rate-feedback@mit.edu](mailto:netflix-rate-feedback@mit.edu) with any questions :)
-
 
 Screenshots
 --------
