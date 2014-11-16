@@ -197,13 +197,13 @@ function checkCache(title) {
 
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
-    if (cachedVal !== undefined && cachedVal.tomatoMeter !== undefined && cachedVal.metacriticScore !== undefined && cachedVal.year !== null) {
+    if (cachedVal !== undefined) {
         inCache = isValidCacheEntry(cachedVal.date);
     }
     return {
         'inCache': inCache,
         'cachedVal': cachedVal,
-        'hasTrailer': cachedVal.trailer !== undefined,
+        'hasTrailer': cachedVal.trailerId !== undefined,
     };
 }
 
@@ -569,11 +569,10 @@ function getTrailer(title, year, addArgs, callback) {
         return;
     }
     var type = getTMDBSearchType(cached.cachedVal.type);
-
+    addTrailerCache(title);
     // ok first find the stupid id.
     $.get(getTMDBSearch(type, title, year), function(res) {
         if (res.results.length === 0) {
-            addTrailerCache(title);
             return null;
         }
         var item_id = res.results[0].id; //just grab the first. meh.
@@ -626,8 +625,15 @@ function getRating(title, year, addArgs, callback) {
         }
         return;
     }
-    $.get(getIMDBAPI(title, year), function(omdbRes) {
-        omdbRes = parseAPIResponse(omdbRes, {
+    addCache(title);
+    var omdbRes = {
+      'Response': 'False',
+    };
+    var metaRes = {
+      'result': false,
+    };
+    $.get(getIMDBAPI(title, year), function(res) {
+        omdbRes = parseAPIResponse(res, {
             'Response': 'False',
         });
 
@@ -640,9 +646,10 @@ function getRating(title, year, addArgs, callback) {
             'headers': {
                 'X-Mashape-Key': MASHAPE_API_KEY
             },
-            'success': function(metaRes) {
+            'success': function(res) {
                 //search based on year and convert to single result
-                if (metaRes.count === 0) {
+                metaRes = res;
+                if (res.count === 0) {
                     metaRes = {
                         'result': false,
                     };
@@ -661,8 +668,9 @@ function getRating(title, year, addArgs, callback) {
                         metaRes = metaRes.results[0];
                     }
                 }
+            },
+        }).always(function(){
                 processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
-            }
         });
 
     });
@@ -732,7 +740,7 @@ function updateCache(title) {
     var cached = checkCache(title);
     if (!cached.inCache) return;
     var cachedVal = cached.cachedVal;
-    if (cachedVal.year === null) {
+    if (cachedVal.year === null && !isValidCacheEntry(cachedVal.date)) {
         var year = parseYear();
         getRating(title, year, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
