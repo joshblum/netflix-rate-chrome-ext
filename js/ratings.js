@@ -185,7 +185,6 @@ function addMetacriticCache(title, metacriticScore, metacriticUrl) {
     return cachedVal;
 }
 
-
 function checkCache(title) {
     if (!(title in CACHE)) {
         return {
@@ -649,7 +648,7 @@ function getRating(title, year, addArgs, callback) {
             'success': function(res) {
                 //search based on year and convert to single result
                 metaRes = res;
-                if (res.count === 0) {
+                if (metaRes.count === 0) {
                     metaRes = {
                         'result': false,
                     };
@@ -669,10 +668,9 @@ function getRating(title, year, addArgs, callback) {
                     }
                 }
             },
-        }).always(function(){
-                processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
+        }).always(function() {
+          processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
         });
-
     });
 }
 
