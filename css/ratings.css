@@ -78,7 +78,7 @@
 }
 
 /*netflix-style*/
-.label {
+.nr-label {
     margin-bottom: 15px !important;
 }
 
@@ -126,7 +126,7 @@
   margin-right: -11px;
 }
 
-.label {
+.nr-label {
   display: inline;
   padding: .2em .6em .3em;
   font-size: 14px;
@@ -138,17 +138,17 @@
   vertical-align: baseline;
   border-radius: .25em;
 }
-a.label:hover,
-a.label:focus {
+a.nr-label:hover,
+a.nr-label:focus {
   color: #fff;
   text-decoration: none;
   cursor: pointer;
   background-color:#bebebe;
 }
-.label:empty {
+.nr-label:empty {
   display: none;
 }
-.btn .label {
+.btn .nr-label {
   position: relative;
   top: -1px;
 }
