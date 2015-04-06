@@ -244,7 +244,7 @@ function clearOld(type, args) {
         $target.find('.rating-link').remove();
         $target.find('.nr-label').remove();
         $target.find('.ratingPredictor').remove();
-        $target.find('.bobMovieActions').remove();
+        $target.find('.nr-popup-rating-container').remove();
     } else if (type === 'trailer') {
         $target.find('.trailer-label').remove();
     }
@@ -746,13 +746,19 @@ function updateCache(title) {
     Build and display the ratings
 */
 function displayRating(rating, args) {
-    var imdbHtml = getIMDBHtml(rating, args.imdbClass);
-    var tomatoHtml = getTomatoHtml(rating, args.rtClass);
-    var metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
-    var $target = $(args.selector);
-    $target[args.insertFunc](imdbHtml);
-    $target[args.insertFunc](tomatoHtml);
-    $target[args.insertFunc](metaHtml);
+    var $imdbHtml = getIMDBHtml(rating, args.imdbClass);
+    var $tomatoHtml = getTomatoHtml(rating, args.rtClass);
+    var $metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
+	
+	var $container = $("<div>", {
+		"class": "nr-popup-rating-container"
+	});
+	$container.append($imdbHtml);
+	$container.append($tomatoHtml);
+	$container.append($metaHtml);
+	
+	var $target = $(args.selector);
+    $target[args.insertFunc]($container);
 }
 
 /*
