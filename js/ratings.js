@@ -358,6 +358,18 @@ function getMashapeAPIUrl() {
     return MASHAPE_API;
 }
 
+function getMashapePostData(title, year) {
+	var data = {
+		'title': title
+	};
+	
+	if (year !== null) {
+		data.year_from = year,
+		data.year_to = parseInt(year) + 1
+	}
+	
+	return data;
+}
 
 ///////////////// USER COUNT ////////////////
 function generateUUID() {
@@ -639,34 +651,17 @@ function getRating(title, year, addArgs, callback) {
         $.ajax({
             'type': 'POST',
             'url': getMashapeAPIUrl(),
-            'data': {
-                'title': title
-            },
+            'data': getMashapePostData(title, year),
             'headers': {
                 'X-Mashape-Key': MASHAPE_API_KEY
             },
-            'success': function(res) {
-                //search based on year and convert to single result
-                metaRes = res;
-                if (metaRes.count === 0) {
-                    metaRes = {
-                        'result': false,
-                    };
-                } else {
-                    var res;
-                    var metaYear;
-                    for (i = 0; i < metaRes.count; i++) {
-                        res = metaRes.results[i];
-                        metaYear = res.rlsdate.split('-')[0];
-                        if (year === parseInt(metaYear)) {
-                            metaRes = res;
-                            break;
-                        }
-                    }
-                    if (year === null || metaRes.max_pages !== undefined) {
-                        metaRes = metaRes.results[0];
-                    }
-                }
+            'success': function(mashapeRes) {
+				for (var i = 0; i < mashapeRes.count; i++) {
+					if (title === mashapeRes.results[i].name) {
+						metaRes = mashapeRes.results[i];
+						break;
+					}
+				}
             },
         }).always(function() {
           processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
