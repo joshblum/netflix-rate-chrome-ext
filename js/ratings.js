@@ -644,9 +644,7 @@ function getRating(title, year, addArgs, callback) {
       'result': false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
-        omdbRes = parseAPIResponse(res, {
-            'Response': 'False',
-        });
+        omdbRes = res;
 
         $.ajax({
             'type': 'POST',
