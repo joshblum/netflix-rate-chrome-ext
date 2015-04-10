@@ -1,3 +1,5 @@
+"use strict";
+
 var TMDB_API_KEY = "04a87a053afac639272eefbb94a173e4";
 var MASHAPE_API_KEY = "o8ExDmFGA5mshpeqIsuOzl2MVcpUp10vM6njsnscSkr7IMivH4";
 
@@ -12,15 +14,15 @@ var YOUTUBE_TRAILER_LINK = "https://www.youtube.com/watch?v=";
 
 //popup movie selectors
 var HOVER_SEL = {
-    '.bobbable .popLink': getWIMainTitle, //wi main display movies
-    '.mdpLink': getSideOrDVDTitle,
+    ".bobbable .popLink": getWIMainTitle, //wi main display movies
+    ".mdpLink": getSideOrDVDTitle,
 };
 
 /////////// PREFETCHING /////////////
 var PREFETCH_CHUNK_SIZE = 5;
 var PREFETCH_INTERVAL = 2500;
 var PREFETCH_SEL = {
-    '.boxShotImg': getImgTitle,
+    ".boxShotImg": getImgTitle,
 };
 
 var CACHE = localStorage;
@@ -43,34 +45,37 @@ function parseAPIResponse(res, default_res) {
 }
 
 /*
-    Builds a select object where the selector is used to insert the ratings via the given insertFunc. Interval specifies the interval necessary for the popupDelay. imdb and rt classes are extra classes that can be added to a rating.
-*/
+ * Builds a select object where the selector is used to insert the ratings via
+ * the given insertFunc. Interval specifies the interval necessary for the
+ * popupDelay. imdb and rt classes are extra classes that can be added to a
+ * rating.
+ */
 function makeSelectObject(selector, insertFunc, interval, klassDict) {
     klassDict = klassDict || {};
 
     return merge({
-        'selector': selector,
-        'insertFunc': insertFunc,
-        'interval': interval,
+        "selector": selector,
+        "insertFunc": insertFunc,
+        "interval": interval,
     }, klassDict);
 }
 
 /*
-    Add the style sheet to the main netflix page.
-*/
+ * Add the style sheet to the main netflix page.
+ */
 function addStyle() {
-    if (!$('#rating-overlay').length) {
-        var url = chrome.extension.getURL('../css/ratings.css');
+    if (!$("#rating-overlay").length) {
+        var url = chrome.extension.getURL("../css/ratings.css");
         $("head").append("<link id='rating-overlay' href='" + url + "' type='text/css' rel='stylesheet' />");
     }
 }
 
 function getRatingArgs() {
-    return getArgs('rating');
+    return getArgs("rating");
 }
 
 function getTrailerArgs() {
-    return getArgs('trailer');
+    return getArgs("trailer");
 }
 
 /*
@@ -79,16 +84,16 @@ function getTrailerArgs() {
  */
 function getArgs(type) {
     var url = document.location.href;
-    var key = 'dvd.netflix.com';
+    var key = "dvd.netflix.com";
     var args;
-    if (url.indexOf(key) != -1) { // we are in dvds
+    if (url.indexOf(key) !== -1) { // we are in dvds
         args = POPUP_INS_SEL[type][key];
         args.key = key;
-        if (type == 'trailer') {
+        if (type === "trailer") {
             args = getTrailerDvdArgs(args, url);
         }
     } else {
-        key = 'movies.netflix.com';
+        key = "movies.netflix.com";
         args = POPUP_INS_SEL[type][key];
         args.key = key;
     }
@@ -99,9 +104,9 @@ function getArgs(type) {
  * Determine the page type to get the correct trailer select object
  */
 function getTrailerDvdArgs(args, url) {
-    var key = 'Movie';
+    var key = "Movie";
     if (url.indexOf(key) === -1) {
-        key = 'Search';
+        key = "Search";
     }
     args = args[key];
     args.key = key;
@@ -111,7 +116,8 @@ function getTrailerDvdArgs(args, url) {
 /*
     Add rating to the cache
 */
-function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, metacriticScore, metacriticUrl, year, type) {
+function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
+    metacriticScore, metacriticUrl, year, type) {
     imdb = imdb || null;
     tomatoMeter = tomatoMeter || null;
     tomatoUserMeter = tomatoUserMeter || null;
@@ -123,16 +129,16 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID, metacriticS
 
     var date = new Date().getTime();
     var rating = {
-        'title': title,
-        'imdb': imdb,
-        'tomatoMeter': tomatoMeter,
-        'tomatoUserMeter': tomatoUserMeter,
-        'imdbID': imdbID,
-        'metacriticScore': metacriticScore,
-        'metacriticUrl': metacriticUrl,
-        'year': year,
-        'date': date,
-        'type': type,
+        "title": title,
+        "imdb": imdb,
+        "tomatoMeter": tomatoMeter,
+        "tomatoUserMeter": tomatoUserMeter,
+        "imdbID": imdbID,
+        "metacriticScore": metacriticScore,
+        "metacriticUrl": metacriticUrl,
+        "year": year,
+        "date": date,
+        "type": type,
     };
 
     CACHE[title] = JSON.stringify(rating);
@@ -148,8 +154,8 @@ function addTrailerCache(title, trailerId) {
 
     if (cachedVal === undefined) {
         cachedVal = {
-            'title': title,
-            'trailerId': trailerId,
+            "title": title,
+            "trailerId": trailerId,
         };
     } else {
         cachedVal.trailerId = trailerId;
@@ -171,9 +177,9 @@ function addMetacriticCache(title, metacriticScore, metacriticUrl) {
 
     if (cachedVal === undefined) {
         cachedVal = {
-            'title': title,
-            'metacriticScore': metacriticScore,
-            'metacriticUrl': metacriticUrl,
+            "title": title,
+            "metacriticScore": metacriticScore,
+            "metacriticUrl": metacriticUrl,
         };
     } else {
         cachedVal.metacriticScore = metacriticScore;
@@ -188,9 +194,9 @@ function addMetacriticCache(title, metacriticScore, metacriticUrl) {
 function checkCache(title) {
     if (!(title in CACHE)) {
         return {
-            'inCache': false,
-            'cachedVal': null,
-            'hasTrailer': false,
+            "inCache": false,
+            "cachedVal": null,
+            "hasTrailer": false,
         };
     }
 
@@ -200,9 +206,9 @@ function checkCache(title) {
         inCache = isValidCacheEntry(cachedVal.date);
     }
     return {
-        'inCache': inCache,
-        'cachedVal': cachedVal,
-        'hasTrailer': cachedVal.trailerId !== undefined,
+        "inCache": inCache,
+        "cachedVal": cachedVal,
+        "hasTrailer": cachedVal.trailerId !== undefined,
     };
 }
 
@@ -216,50 +222,54 @@ function isValidCacheEntry(date) {
 }
 
 /*
-    Helper to generalize the parser for side titles and DVD titles
-*/
+ * Helper to generalize the parser for side titles and DVD titles
+ */
 function getWrappedTitle(e, key, regex) {
-    var title = $(e.target).attr('alt');
+    var title = $(e.target).attr("alt");
     if (title === undefined) {
         var url = $(e.target).context.href;
         if (typeof url === "undefined") {
             return "";
         }
-        url = url.split('/');
+        url = url.split("/");
         title = url[url.indexOf(key) + 1];
-        title = title.replace(regex, ' ');
+        title = title.replace(regex, " ");
     }
     return title;
 }
 
 /*
-    Clear old ratings and unused content. Differs for different popups
-*/
+ * Clear old ratings and unused content. Differs for different popups
+ */
 function clearOld(type, args) {
-    var $target = $('#BobMovie');
-    if (args.key in POPUP_INS_SEL[type]['movies.netflix.com']) {
-        $target.find('p.label').contents().remove();
+    var $target = $("#BobMovie");
+    if (args.key in POPUP_INS_SEL[type]["movies.netflix.com"]) {
+        $target.find("p.label").contents().remove();
     }
-    if (type === 'rating') {
-        $target.find('.rating-link').remove();
-        $target.find('.label').remove();
-        $target.find('.ratingPredictor').remove();
-        $target.find('.bobMovieActions').remove();
-    } else if (type === 'trailer') {
-        $target.find('.trailer-label').remove();
+    if (type === "rating") {
+        $target.find(".rating-link").remove();
+        $target.find(".label").remove();
+        $target.find(".ratingPredictor").remove();
+        $target.find(".bobMovieActions").remove();
+    } else if (type === "trailer") {
+        $target.find(".trailer-label").remove();
     }
 }
 
 function getTomatoClass(score) {
-    return score < 59 ? 'rotten' : 'fresh';
+    return score < 59 ? "rotten" : "fresh";
 }
 
 function getMetacriticClass(score) {
     var klass;
-    if (score > 60) klass = 'favorable';
-    else if (score > 40) klass = 'average';
-    else klass = 'unfavorable';
-    return 'metacritic-' + klass;
+    if (score > 60) {
+        klass = "favorable";
+    } else if (score > 40) {
+        klass = "average";
+    } else {
+        klass = "unfavorable";
+    }
+    return "metacritic-" + klass;
 }
 
 ///////////////// URL BUILDERS ////////////////
@@ -268,9 +278,9 @@ function getMetacriticClass(score) {
     Builds and returns the imdbAPI url
 */
 function getIMDBAPI(title, year) {
-    var url = IMDB_API + '&t=' + title;
+    var url = IMDB_API + "&t=" + title;
     if (year !== null) {
-        url += '&y=' + year;
+        url += "&y=" + year;
     }
     return url;
 }
@@ -310,13 +320,13 @@ function getTMDBSearch(type, query, year) {
     url = appendTMDBAPIKey(url);
     url += "&query=" + query;
     if (year !== null) {
-        url += '&year=' + year;
+        url += "&year=" + year;
     }
     return url;
 }
 
 function getTMDBItemUrl(type, item_id) {
-    if (type === 'movie') {
+    if (type === "movie") {
         return getTMDBMovie(item_id);
     }
     return getTMDBTV(item_id);
@@ -361,9 +371,9 @@ function getMashapeAPIUrl() {
 
 ///////////////// USER COUNT ////////////////
 function generateUUID() {
-    return 'xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return "xxxxxxxx-xxxx-3xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0,
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
+            v = c === "x" ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
@@ -418,8 +428,8 @@ function countUser() {
         return;
     }
     $.post(getB3Link(), {
-        'uuid': getUUID(),
-        'src': getSrc(),
+        "uuid": getUUID(),
+        "src": getSrc(),
     }, function(res) {
         if (!res.success) {
             clearUUIDCache();
@@ -434,14 +444,14 @@ function countUser() {
     parses form: http://movies.netflix.com/WiPlayer?movieid=70171942&trkid=7103274&t=Archer
 */
 function getWIMainTitle(e) {
-    return $(e.target).siblings('img').attr('alt');
+    return $(e.target).siblings("img").attr("alt");
 }
 
 /*
     Cleanup recently watched title
 */
 function getRecentTitle(title) {
-    var index = title.indexOf('%3A');
+    var index = title.indexOf("%3A");
     if (index !== -1) {
         title = title.slice(0, index);
     }
@@ -453,12 +463,12 @@ function getRecentTitle(title) {
 */
 function getSideOrDVDTitle(e) {
     var url = document.location.href;
-    if (url.indexOf('Search') != -1) { //no popups on search page.
+    if (url.indexOf("Search") !== -1) { //no popups on search page.
         return $(e.target).text(); // but still cache the title
     }
 
-    var key = 'dvd.netflix.com';
-    if (url.indexOf(key) != -1) { // we are in dvds now
+    var key = "dvd.netflix.com";
+    if (url.indexOf(key) !== -1) { // we are in dvds now
         return getDVDTitle(e);
     }
     return getSideTitle(e);
@@ -484,30 +494,30 @@ function getImgTitle(el) {
 }
 
 function parseYear($target) {
-    $target = $target || $('.year');
+    $target = $target || $(".year");
     var year = null;
     if ($target.length) {
-        year = $target.text().split('-')[0];
+        year = $target.text().split("-")[0];
     }
     return year;
 }
 
 /*
-    Parse the search title for a given search result
-*/
+ * Parse the search title for a given search result
+ */
 function parseSearchTitle($target) {
-    return $target.find('.title').children().text();
+    return $target.find(".title").children().text();
 }
 
 function parseMovieTitle($target) {
-    return $target.find('.title').text();
+    return $target.find(".title").text();
 }
 
 /////////// RATING HANDLERS ////////////
 
 /*
- * Find all of the elements with the given selector and try to
- * prefetch the title information. This should reduce lag once we cache everything.
+ * Find all of the elements with the given selector and try to prefetch the
+ * title information. This should reduce lag once we cache everything.
  */
 function prefetchHandler(selector, parser) {
     var start = 0;
@@ -539,7 +549,7 @@ function prefetchChunkProcessor($slice, parser) {
 
 function popupHandler(e) {
     var title = e.data(e); //title parse funtion
-    if ($('.label').contents() !== '') { //the popup isn't already up
+    if ($(".label").contents() !== "") { //the popup isn't already up
         //null year, null addArgs
         getRating(title, null, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
@@ -552,8 +562,8 @@ function popupHandler(e) {
 }
 
 /*
-    Search for the title, first in the CACHE and then through the API
-*/
+ * Search for the title, first in the CACHE and then through the API
+ */
 function getTrailer(title, year, addArgs, callback) {
     var cached = checkCache(title);
     if (cached.hasTrailer) {
@@ -562,8 +572,10 @@ function getTrailer(title, year, addArgs, callback) {
         }
         return;
     }
-    if (cached.cachedVal === null || title === '') return; // we need the type!
-    if (!('type' in cached.cachedVal)) {
+    if (cached.cachedVal === null || title === "") {
+        return;
+    } // we need the type!
+    if (!("type" in cached.cachedVal)) {
         delete CACHE[title]; // update structure
         return;
     }
@@ -591,8 +603,11 @@ function getTrailer(title, year, addArgs, callback) {
  * to what TMDB_API expects
  */
 function getTMDBSearchType(type) {
-    if (type === "movie") return "movie";
-    return "tv";
+    if (type === "movie") {
+        return "movie";
+    } else {
+        return "tv";
+    }
 }
 
 
@@ -600,22 +615,25 @@ function getTMDBSearchType(type) {
  * Extracts a youtube trailer id or returns null
  */
 function extractTrailerId(type, res) {
-    if (type === 'movie') {
-        var youtube = res.trailers.youtube;
-        if (youtube.length === 0) return null;
-        return youtube[0].source;
-    } else {
-        for (var result in res.results) {
-            if (result.site === "YouTube") {
-                return result.key;
+        if (type === "movie") {
+            var youtube = res.trailers.youtube;
+            if (youtube.length === 0) {
+                return null;
+            } else {
+                return youtube[0].source;
             }
+        } else {
+            for (var result in res.results) {
+                if (result.site === "YouTube") {
+                    return result.key;
+                }
+            }
+            return null;
         }
-        return null;
     }
-}
-/*
-    Search for the title, first in the CACHE and then through the API
-*/
+    /*
+     * Search for the title, first in the CACHE and then through the API
+     */
 function getRating(title, year, addArgs, callback) {
     var cached = checkCache(title);
     if (cached.inCache) {
@@ -626,38 +644,37 @@ function getRating(title, year, addArgs, callback) {
     }
     addCache(title);
     var omdbRes = {
-      'Response': 'False',
+        "Response": "False",
     };
     var metaRes = {
-      'result': false,
+        "result": false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
         omdbRes = parseAPIResponse(res, {
-            'Response': 'False',
+            "Response": "False",
         });
 
         $.ajax({
-            'type': 'POST',
-            'url': getMashapeAPIUrl(),
-            'data': {
-                'title': title
+            "type": "POST",
+            "url": getMashapeAPIUrl(),
+            "data": {
+                "title": title
             },
-            'headers': {
-                'X-Mashape-Key': MASHAPE_API_KEY
+            "headers": {
+                "X-Mashape-Key": MASHAPE_API_KEY
             },
-            'success': function(res) {
+            "success": function(res) {
                 //search based on year and convert to single result
                 metaRes = res;
                 if (metaRes.count === 0) {
                     metaRes = {
-                        'result': false,
+                        "result": false,
                     };
                 } else {
-                    var res;
                     var metaYear;
-                    for (i = 0; i < metaRes.count; i++) {
+                    for (var i = 0; i < metaRes.count; i++) {
                         res = metaRes.results[i];
-                        metaYear = res.rlsdate.split('-')[0];
+                        metaYear = res.rlsdate.split("-")[0];
                         if (year === parseInt(metaYear)) {
                             metaRes = res;
                             break;
@@ -669,14 +686,14 @@ function getRating(title, year, addArgs, callback) {
                 }
             },
         }).always(function() {
-          processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
+            processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
         });
     });
 }
 
 function processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs) {
     // both apis failed
-    if (omdbRes.Response === 'False' && metaRes.result === false) {
+    if (omdbRes.Response === "False" && metaRes.result === false) {
         addCache(title);
         return null;
     }
@@ -685,22 +702,23 @@ function processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs
     var tomatoUserMeter = getTomatoScore(omdbRes, "tomatoUserMeter");
     var metacriticScore = parseInt(metaRes.score);
     var metacriticUrl = metaRes.url;
-    var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter, omdbRes.imdbID, metacriticScore, metacriticUrl, year, omdbRes.Type);
+    var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter,
+        omdbRes.imdbID, metacriticScore, metacriticUrl, year, omdbRes.Type);
     if (callback) {
         callback(rating, addArgs);
     }
 }
 
 /*
-    parse tomato rating from api response object
-*/
+ * parse tomato rating from api response object
+ */
 function getTomatoScore(res, meterType) {
     return res[meterType] === "N/A" ? null : parseInt(res[meterType]);
 }
 
 /*
-    Given a rating and specific arguments, display to popup
-*/
+ * Given a rating and specific arguments, display to popup
+ */
 function showPopupRating(rating, args) {
     showInPopup(rating, args, displayRating, "rating");
 }
@@ -732,11 +750,13 @@ function showInPopup(obj, args, displayFunc, type) {
 }
 
 /*
-    Call the API with the year and update the rating if neccessary
-*/
+ * Call the API with the year and update the rating if neccessary
+ */
 function updateCache(title) {
     var cached = checkCache(title);
-    if (!cached.inCache) return;
+    if (!cached.inCache) {
+        return;
+    }
     var cachedVal = cached.cachedVal;
     if (cachedVal.year === null && !isValidCacheEntry(cachedVal.date)) {
         var year = parseYear();
@@ -750,8 +770,8 @@ function updateCache(title) {
 }
 
 /*
-    Build and display the ratings
-*/
+ * Build and display the ratings
+ */
 function displayRating(rating, args) {
     var imdbHtml = getIMDBHtml(rating, args.imdbClass);
     var tomatoHtml = getTomatoHtml(rating, args.rtClass);
@@ -770,12 +790,12 @@ function displayTrailer(trailer, args) {
     var trailerHtml = getTrailerLabelHtml(trailerId, args.trailerClass);
     var $target = $(args.selector);
     $target[args.insertFunc](trailerHtml);
-    var $trailer = $('#' + trailerId);
+    var $trailer = $("#" + trailerId);
     $trailer.popover({
-        'content': getTrailerPlayerHtml(trailerId),
-        'html': true,
-        'trigger': 'manual',
-        'placement': function(context, source) {
+        "content": getTrailerPlayerHtml(trailerId),
+        "html": true,
+        "trigger": "manual",
+        "placement": function(context, source) {
             var position = $(source).position();
 
             if (position.top < 110) {
@@ -796,7 +816,7 @@ function displayTrailer(trailer, args) {
         var _this = this;
         $(this).popover("show");
         $(this).siblings(".popover").on("mouseleave", function() {
-            $(_this).popover('hide');
+            $(_this).popover("hide");
         });
     }).on("mouseleave", function() {
         var _this = this;
@@ -807,24 +827,24 @@ function displayTrailer(trailer, args) {
         }, 100);
     });
     $trailer.click(function() {
-        $trailer.popover('hide');
+        $trailer.popover("hide");
     });
 }
 
 ////////SEARCH AND INDIVIDUAL PAGE HANDLERS //////////
 /*
-    Determine which search, dvd or watch instantly and display the correct ratings
-*/
+ * Determine which search, dvd or watch instantly and display the correct ratings
+ */
 function isSearchPage() {
-    return isPage('Search');
+    return isPage("Search");
 }
 
 function isMoviePage() {
-    return isPage('Movie');
+    return isPage("Movie");
 }
 
 function isDvdPage() {
-    return isPage('dvd.netflix.com');
+    return isPage("dvd.netflix.com");
 }
 
 function isPage(key) {
@@ -832,18 +852,18 @@ function isPage(key) {
 }
 
 /*
-    Find ratings for all of the movies found by the search and display them
-*/
+ * Find ratings for all of the movies found by the search and display them
+ */
 function displaySearch() {
     var selector = ".agMovie";
     var ratingSelector = SEARCH_SEL.rating.selector;
     var trailerSelector = SEARCH_SEL.trailer.selector;
     $.each($(selector), function(index, target) { // iterate over movies found
         var $target = $(target);
-        var year = parseYear($target.find('.year'));
+        var year = parseYear($target.find(".year"));
         var title = parseSearchTitle($target);
         var addArgs = {
-            'target': $target,
+            "target": $target,
         }; // add the current target so the rating matches the movie found
         getRating(title, year, addArgs, function(rating, addArgs) {
             var selectObject = deepCopy(SEARCH_SEL.rating);
@@ -870,10 +890,10 @@ function displayMovie() {
         selector = "#displaypage-overview-details";
         $target = $(selector);
     }
-    var year = parseYear($target.find('.year'));
+    var year = parseYear($target.find(".year"));
     var title = parseMovieTitle($target);
     var addArgs = {
-        'target': $target,
+        "target": $target,
     }; // add the current target so the rating matches the movie found
     getRating(title, year, addArgs, function(rating, addArgs) {
         var selectObject = deepCopy(MOVIE_SEL.rating);
@@ -883,8 +903,8 @@ function displayMovie() {
 
     getTrailer(title, year, addArgs, function(trailer, addArgs) {
         var selectObject = deepCopy(MOVIE_SEL.trailer);
-        if (isPage('WiMovie')) {
-            selector += ' > .titleArea';
+        if (isPage("WiMovie")) {
+            selector += " > .titleArea";
         }
         selectObject.selector = selector + MOVIE_SEL.trailer.selector;
         displayTrailer(trailer, selectObject);
@@ -892,14 +912,14 @@ function displayMovie() {
 }
 
 function setupDvdPopupHandler() {
-    var $popup = $('#BobMovie');
-    $('.agMovie').on('mousenter', function(event) {
+    var $popup = $("#BobMovie");
+    $(".agMovie").on("mousenter", function(event) {
         $popup.hide();
-    }).on('mouseleave', function(event) {
+    }).on("mouseleave", function(event) {
         $popup.show();
     });
 
-    $popup.on('mouseleave', function(event) {
+    $popup.on("mouseleave", function(event) {
         $popup.hide();
     });
 }
@@ -907,41 +927,41 @@ function setupDvdPopupHandler() {
 /////////// HTML BUILDERS ////////////
 function getIMDBHtml(rating, klass) {
     var score = rating.imdb;
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getIMDBLink(rating.imdbID)) + '"><div class="imdb imdb-icon star-box-giga-star" title="IMDB Rating"></div></a>');
+    var html = $("<a class='rating-link' target='_blank' href='" + escapeHTML(getIMDBLink(rating.imdbID)) + "'><div class='imdb imdb-icon star-box-giga-star' title='IMDB Rating'></div></a>");
     if (!score) {
-        html.css('visibility', 'hidden');
+        html.css("visibility", "hidden");
     } else {
-        html.find('.imdb').addClass(klass).append(score.toFixed(1));
+        html.find(".imdb").addClass(klass).append(score.toFixed(1));
     }
     return html;
 }
 
 function getTomatoHtml(rating, klass) {
     if (!rating.tomatoMeter) {
-        return '<span class="rating-link tomato-filler"></span>';
+        return "<span class='rating-link tomato-filler'></span>";
     }
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(getTomatoLink(rating.imdbID)) + '"><span class="tomato tomato-wrapper" title="Rotten Tomato Rating"><span class="rt-icon tomato-icon med"></span><span class="rt-score tomato-score"></span></span></a>');
+    var html = $("<a class='rating-link' target='_blank' href='" + escapeHTML(getTomatoLink(rating.imdbID)) + "'><span class='tomato tomato-wrapper' title='Rotten Tomato Rating'><span class='rt-icon tomato-icon med'></span><span class='rt-score tomato-score'></span></span></a>");
 
-    html.find('.tomato-icon').addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
-    html.find('.tomato-score').append(rating.tomatoMeter + '%');
+    html.find(".tomato-icon").addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
+    html.find(".tomato-score").append(rating.tomatoMeter + "%");
 
     return html;
 }
 
 function getMetatcriticHtml(rating, klass) {
-    var html = $('<a class="rating-link" target="_blank" href="' + escapeHTML(rating.metacriticUrl) + '"><span class="metascore metacritic-rating" title="MetaCritic Rating">' + rating.metacriticScore + '</span>');
-    html.find('.metacritic-rating').addClass(getMetacriticClass(rating.metacriticScore));
+    var html = $("<a class='rating-link' target='_blank' href='" + escapeHTML(rating.metacriticUrl) + "'><span class='metascore metacritic-rating' title='MetaCritic Rating'>" + rating.metacriticScore + "</span>");
+    html.find(".metacritic-rating").addClass(getMetacriticClass(rating.metacriticScore));
     if (!rating.metacriticScore) {
-        html.css('visibility', 'hidden');
+        html.css("visibility", "hidden");
     }
     return html;
 }
 
 function getTrailerLabelHtml(trailerId, klass) {
     if (trailerId === null) {
-        return '';
+        return "";
     }
-    klass = klass || '';
+    klass = klass || "";
     var html = $("<a target='_blank' id='" + trailerId + "' class='" + klass + " trailer-label' href='" + getYouTubeTrailerLink(trailerId) +
         "'><span class='label label-default'>Trailer</span></a>");
     return html;
@@ -949,19 +969,20 @@ function getTrailerLabelHtml(trailerId, klass) {
 }
 
 function getTrailerPlayerHtml(trailerId, klass) {
-    return '<iframe allowfullscreen="1" type="text/html" width="480" height="292" src="http://www.youtube.com/embed/' + trailerId + '?autoplay=1" frameborder="0"/>';
+    return "<iframe allowfullscreen='1' type='text/html' width='480' height='292' src='http://www.youtube.com/embed/'" + trailerId + "?autoplay=1' frameborder='0'/>";
 }
 
-
 /*
-    Helper function for escaping API urls
-*/
+ * Helper function for escaping API urls
+ */
 function escapeHTML(str) {
-    if (str === null) return str;
+    if (str === null) {
+        return str;
+    }
     return str.replace(/[&"<>]/g, function(m) {
         return {
             "&": "&amp;",
-            '"': "&quot;",
+            "'": "&quot;",
             "<": "&lt;",
             ">": "&gt;",
         }[m];
@@ -969,10 +990,12 @@ function escapeHTML(str) {
 }
 
 function cleanYouTubeId(id) {
-    if (id === null) return null;
-    return id.split('').filter(function(c) {
+    if (id === null) {
+        return null;
+    }
+    return id.split("").filter(function(c) {
         return c.charCodeAt(0) < 255;
-    }).join('');
+    }).join("");
 }
 
 /*
@@ -995,42 +1018,42 @@ $(document).ready(function() {
 
     //poup select types
     POPUP_INS_SEL = {
-        'rating': {
-            'movies.netflix.com': makeSelectObject('.midBob', 'append', 800, {
-                'imdbClass': 'imdb-wi',
+        "rating": {
+            "movies.netflix.com": makeSelectObject(".midBob", "append", 800, {
+                "imdbClass": "imdb-wi",
             }),
-            'dvd.netflix.com': makeSelectObject('.bobMovieRatings', 'append', 800, {
-                'imdbClass': 'dvd-popup',
-                'rtClass': 'dvd-rt-icon',
+            "dvd.netflix.com": makeSelectObject(".bobMovieRatings", "append", 800, {
+                "imdbClass": "dvd-popup",
+                "rtClass": "dvd-rt-icon",
             }),
         },
-        'trailer': {
-            'movies.netflix.com': makeSelectObject('.bobMovieHeader', 'append', 800),
-            'dvd.netflix.com': {
-                'Movie': makeSelectObject('.bobMovieHeader', 'append', 800),
-                'Search': makeSelectObject('.duration', 'append', -1),
+        "trailer": {
+            "movies.netflix.com": makeSelectObject(".bobMovieHeader", "append", 800),
+            "dvd.netflix.com": {
+                "Movie": makeSelectObject(".bobMovieHeader", "append", 800),
+                "Search": makeSelectObject(".duration", "append", -1),
             }
         }
     };
 
     //search select types
     SEARCH_SEL = {
-        'rating': makeSelectObject('.bluray', 'append', -1, {
-            'imdbClass': 'dvd-search-page',
-            'rtClass': 'search-rt-icon',
+        "rating": makeSelectObject(".bluray", "append", -1, {
+            "imdbClass": "dvd-search-page",
+            "rtClass": "search-rt-icon",
         }),
-        'trailer': makeSelectObject('.synopsis', 'before', 800, {
-            'trailerClass': 'dvd-trailer-label',
+        "trailer": makeSelectObject(".synopsis", "before", 800, {
+            "trailerClass": "dvd-trailer-label",
         }),
     };
 
     MOVIE_SEL = {
-        'rating': makeSelectObject('.title', 'append', -1, {
-            'imdbClass': 'dvd-movie',
-            'rtClass': 'dvd-rt-icon',
+        "rating": makeSelectObject(".title", "append", -1, {
+            "imdbClass": "dvd-movie",
+            "rtClass": "dvd-rt-icon",
         }),
-        'trailer': makeSelectObject(' > span:last', 'append', -1, {
-            'trailerClass': 'dvd-trailer-label',
+        "trailer": makeSelectObject(" > span:last", "append", -1, {
+            "trailerClass": "dvd-trailer-label",
         }),
     };
 
@@ -1048,7 +1071,7 @@ $(document).ready(function() {
         displaySearch(); // check if this is a search page
     } else {
         $.each(HOVER_SEL, function(selector, parser) { //add listeners for each hover selector
-            $(document).on('mouseenter', selector, parser, popupHandler);
+            $(document).on("mouseenter", selector, parser, popupHandler);
         });
 
         //try to prefetch results

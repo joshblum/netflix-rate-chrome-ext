@@ -9,8 +9,6 @@ Download directly from the <a href="https://chrome.google.com/webstore/detail/ne
 
 <a href="http://netflix.burtonthird.com" target="_blank">Share this extension</a>.
 
-Netflix-rate is available under the [MIT license](http://opensource.org/licenses/MIT).
-
 Screenshots
 --------
 
@@ -18,13 +16,6 @@ Screenshots
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/wi-popup.png "wi popup")
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-popup.png "dvd popup")
 ![alt text](http://netflix.burtonthird.com/static/img/screenshots/dvd-search.png "dvd search")
-
-Author
---------
-
-**Josh Blum**
-+ [joshblum@mit.edu](mailto:joshblum@mit.edu)
-+ [@blumua](https://twitter.com/blumua)
 
 Contributions
 --------

@@ -1,0 +1,21 @@
+{
+    "globals": {
+        "module": false,
+        "require": false
+    },
+    "browser": true,
+    "jquery": true,
+    "debug": false,
+    "laxcomma": true,
+    "camelcase": false,
+    "curly": true,
+    "immed": true,
+    "newcap": true,
+    "quotmark": "double",
+    "undef": true,
+    "strict": true,
+    "trailing": true,
+    "globalstrict": true,
+    "eqeqeq": true,
+    "predef": ["console", "chrome", "POPUP_INS_SEL", "SEARCH_SEL", "MOVIE_SEL"]
+}
