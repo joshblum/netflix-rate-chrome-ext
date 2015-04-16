@@ -13,5 +13,4 @@ zip -r chrome-ext.zip netflix-rate-chrome-ext/ -x *.git*
 cd $ROOT
 git add manifest.json
 git commit -m "Webstore deploy $version"
-git checkout js/common.js
 git push origin master
