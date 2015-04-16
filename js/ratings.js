@@ -1012,51 +1012,51 @@ function deepCopy(object) {
     return $.extend(true, {}, object);
 }
 
+//poup select types
+var POPUP_INS_SEL = {
+    "rating": {
+        "movies.netflix.com": makeSelectObject(".midBob", "append", 800, {
+            "imdbClass": "imdb-wi",
+        }),
+        "dvd.netflix.com": makeSelectObject(".bobMovieRatings", "append", 800, {
+            "imdbClass": "dvd-popup",
+            "rtClass": "dvd-rt-icon",
+        }),
+    },
+    "trailer": {
+        "movies.netflix.com": makeSelectObject(".bobMovieHeader", "append", 800),
+        "dvd.netflix.com": {
+            "Movie": makeSelectObject(".bobMovieHeader", "append", 800),
+            "Search": makeSelectObject(".duration", "append", -1),
+        }
+    }
+};
+
+//search select types
+var SEARCH_SEL = {
+    "rating": makeSelectObject(".bluray", "append", -1, {
+        "imdbClass": "dvd-search-page",
+        "rtClass": "search-rt-icon",
+        "containerKlass": "nr-noop"
+    }),
+    "trailer": makeSelectObject(".synopsis", "before", 800, {
+        "trailerClass": "dvd-trailer-label",
+    }),
+};
+
+var MOVIE_SEL = {
+    "rating": makeSelectObject(".title", "append", -1, {
+        "imdbClass": "dvd-movie",
+        "rtClass": "dvd-rt-icon",
+    }),
+    "trailer": makeSelectObject(" > span:last", "append", -1, {
+        "trailerClass": "dvd-trailer-label",
+    }),
+};
+
 ///////// INIT /////////////
 $(document).ready(function() {
     countUser();
-
-    //poup select types
-    POPUP_INS_SEL = {
-        "rating": {
-            "movies.netflix.com": makeSelectObject(".midBob", "append", 800, {
-                "imdbClass": "imdb-wi",
-            }),
-            "dvd.netflix.com": makeSelectObject(".bobMovieRatings", "append", 800, {
-                "imdbClass": "dvd-popup",
-                "rtClass": "dvd-rt-icon",
-            }),
-        },
-        "trailer": {
-            "movies.netflix.com": makeSelectObject(".bobMovieHeader", "append", 800),
-            "dvd.netflix.com": {
-                "Movie": makeSelectObject(".bobMovieHeader", "append", 800),
-                "Search": makeSelectObject(".duration", "append", -1),
-            }
-        }
-    };
-
-    //search select types
-    SEARCH_SEL = {
-        "rating": makeSelectObject(".bluray", "append", -1, {
-            "imdbClass": "dvd-search-page",
-            "rtClass": "search-rt-icon",
-            "containerKlass": "nr-noop"
-        }),
-        "trailer": makeSelectObject(".synopsis", "before", 800, {
-            "trailerClass": "dvd-trailer-label",
-        }),
-    };
-
-    MOVIE_SEL = {
-        "rating": makeSelectObject(".title", "append", -1, {
-            "imdbClass": "dvd-movie",
-            "rtClass": "dvd-rt-icon",
-        }),
-        "trailer": makeSelectObject(" > span:last", "append", -1, {
-            "trailerClass": "dvd-trailer-label",
-        }),
-    };
 
     addStyle(); //add ratings.css to the page
 
