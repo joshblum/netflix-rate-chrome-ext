@@ -287,6 +287,9 @@ function getTomatoAPILink(imdbId) {
     Build the url for the rtLink
 */
 function getTomatoLink(rating, callback) {
+    if (!rating.imdbID) {
+        callback(rating);
+    }
     var imdbID = rating.imdbID.slice(2); //convert tt123456 -> 123456
     var cached = checkCache(rating.title);
     if (cached.inCache && cached.cachedVal.tomatoAliasUrl !== undefined) {
