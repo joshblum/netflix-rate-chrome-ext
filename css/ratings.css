@@ -84,6 +84,10 @@
   margin-bottom: 40px;
 }
 
+.nr-noop {
+  /* placeholder class */
+}
+
 .nr-label {
     margin-bottom: 15px !important;
 }

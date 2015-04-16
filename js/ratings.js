@@ -49,6 +49,7 @@ function makeSelectObject(selector, insertFunc, interval, klassDict) {
     klassDict = klassDict || {};
 
     return merge({
+        'containerKlass': 'nr-popup-rating-container',
         'selector': selector,
         'insertFunc': insertFunc,
         'interval': interval,
@@ -244,7 +245,7 @@ function clearOld(type, args) {
         $target.find('.rating-link').remove();
         $target.find('.nr-label').remove();
         $target.find('.ratingPredictor').remove();
-        $target.find('.nr-popup-rating-container').remove();
+        $target.find('.' + args.containerKlass).remove();
     } else if (type === 'trailer') {
         $target.find('.trailer-label').remove();
     }
@@ -751,7 +752,7 @@ function displayRating(rating, args) {
     var $metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
 
     var $container = $("<div>", {
-        "class": "nr-popup-rating-container"
+        "class": args.containerKlass,
     });
     $container.append($imdbHtml);
     $container.append($tomatoHtml);
@@ -1017,6 +1018,7 @@ $(document).ready(function() {
         'rating': makeSelectObject('.bluray', 'append', -1, {
             'imdbClass': 'dvd-search-page',
             'rtClass': 'search-rt-icon',
+            'containerKlass': 'nr-noop'
         }),
         'trailer': makeSelectObject('.synopsis', 'before', 800, {
             'trailerClass': 'dvd-trailer-label',
