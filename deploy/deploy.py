@@ -2,6 +2,7 @@ import json
 
 MANIFEST_PATH = 'manifest.json'
 
+
 def rewrite_manifest():
   with open(MANIFEST_PATH, 'r+') as f:
     data = json.load(f)

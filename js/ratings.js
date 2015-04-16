@@ -54,10 +54,10 @@ function makeSelectObject(selector, insertFunc, interval, klassDict) {
     klassDict = klassDict || {};
 
     return merge({
-        'containerKlass': 'nr-popup-rating-container',
-        'selector': selector,
-        'insertFunc': insertFunc,
-        'interval': interval,
+        "containerKlass": "nr-popup-rating-container",
+        "selector": selector,
+        "insertFunc": insertFunc,
+        "interval": interval,
     }, klassDict);
 }
 
@@ -243,17 +243,17 @@ function getWrappedTitle(e, key, regex) {
  * Clear old ratings and unused content. Differs for different popups
  */
 function clearOld(type, args) {
-    var $target = $('#BobMovie');
-    if (args.key in POPUP_INS_SEL[type]['movies.netflix.com']) {
-        $target.find('p.nr-label').contents().remove();
+    var $target = $("#BobMovie");
+    if (args.key in POPUP_INS_SEL[type]["movies.netflix.com"]) {
+        $target.find("p.nr-label").contents().remove();
     }
-    if (type === 'rating') {
-        $target.find('.rating-link').remove();
-        $target.find('.nr-label').remove();
-        $target.find('.ratingPredictor').remove();
-        $target.find('.' + args.containerKlass).remove();
-    } else if (type === 'trailer') {
-        $target.find('.trailer-label').remove();
+    if (type === "rating") {
+        $target.find(".rating-link").remove();
+        $target.find(".nr-label").remove();
+        $target.find(".ratingPredictor").remove();
+        $target.find("." + args.containerKlass).remove();
+    } else if (type === "trailer") {
+        $target.find(".trailer-label").remove();
     }
 }
 
@@ -371,12 +371,12 @@ function getMashapeAPIUrl() {
 
 function getMashapePostData(title, year) {
     var data = {
-        'title': title
+        "title": title
     };
 
     if (year !== null) {
-        data.year_from = year,
-            data.year_to = parseInt(year) + 1
+        data.year_from = year;
+        data.year_to = parseInt(year) + 1;
     }
 
     return data;
@@ -562,7 +562,7 @@ function prefetchChunkProcessor($slice, parser) {
 
 function popupHandler(e) {
     var title = e.data(e); //title parse funtion
-    if ($('.nr-label').contents() !== '') { //the popup isn't already up
+    if ($(".nr-label").contents() !== "") { //the popup isn't already up
         //null year, null addArgs
         getRating(title, null, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
@@ -628,9 +628,11 @@ function getTMDBSearchType(type) {
  * Extracts a youtube trailer id or returns null
  */
 function extractTrailerId(type, res) {
-        if (type === 'movie') {
+        if (type === "movie") {
             var youtube = res.trailers.youtube;
-            if (youtube.length === 0) return null;
+            if (youtube.length === 0) {
+                return null;
+            }
             return youtube[0].source;
         } else {
             for (var result in res.results) {
@@ -654,22 +656,22 @@ function getRating(title, year, addArgs, callback) {
     }
     addCache(title);
     var omdbRes = {
-        'Response': 'False',
+        "Response": "False",
     };
     var metaRes = {
-        'result': false,
+        "result": false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
         omdbRes = res;
 
         $.ajax({
-            'type': 'POST',
-            'url': getMashapeAPIUrl(),
-            'data': getMashapePostData(title, year),
-            'headers': {
-                'X-Mashape-Key': MASHAPE_API_KEY
+            "type": "POST",
+            "url": getMashapeAPIUrl(),
+            "data": getMashapePostData(title, year),
+            "headers": {
+                "X-Mashape-Key": MASHAPE_API_KEY
             },
-            'success': function(mashapeRes) {
+            "success": function(mashapeRes) {
                 for (var i = 0; i < mashapeRes.count; i++) {
                     if (title === mashapeRes.results[i].name) {
                         metaRes = mashapeRes.results[i];
@@ -1036,10 +1038,10 @@ $(document).ready(function() {
 
     //search select types
     SEARCH_SEL = {
-        'rating': makeSelectObject('.bluray', 'append', -1, {
-            'imdbClass': 'dvd-search-page',
-            'rtClass': 'search-rt-icon',
-            'containerKlass': 'nr-noop'
+        "rating": makeSelectObject(".bluray", "append", -1, {
+            "imdbClass": "dvd-search-page",
+            "rtClass": "search-rt-icon",
+            "containerKlass": "nr-noop"
         }),
         "trailer": makeSelectObject(".synopsis", "before", 800, {
             "trailerClass": "dvd-trailer-label",
