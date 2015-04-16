@@ -2,12 +2,13 @@
 
 var TMDB_API_KEY = "04a87a053afac639272eefbb94a173e4";
 var MASHAPE_API_KEY = "o8ExDmFGA5mshpeqIsuOzl2MVcpUp10vM6njsnscSkr7IMivH4";
+var TOMATO_API_KEY = "85jwjhunznmwuwas9qfvdwhf";
 
 var IMDB_API = "http://www.omdbapi.com/?tomatoes=true";
 var TMDB_API = "http://api.themoviedb.org/3";
 var MASHAPE_API = "https://byroredux-metacritic.p.mashape.com/search/movie";
+var TOMATO_API = "http://api.rottentomatoes.com/api/public/v1.0/movie_alias.json?apikey=" + TOMATO_API_KEY + "&type=imdb&id=";
 
-var TOMATO_LINK = "http://www.rottentomatoes.com/alias?type=imdbid&s=";
 var IMDB_LINK = "http://www.imdb.com/title/";
 var B3_LINK = "http://netflix.burtonthird.com/count";
 var YOUTUBE_TRAILER_LINK = "https://www.youtube.com/watch?v=";
@@ -117,7 +118,7 @@ function getTrailerDvdArgs(args, url) {
 /*
     Add rating to the cache
 */
-function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
+function addRatingCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
     metacriticScore, metacriticUrl, year, type) {
     imdb = imdb || null;
     tomatoMeter = tomatoMeter || null;
@@ -128,8 +129,7 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
     year = year || null;
     type = type || null;
 
-    var date = new Date().getTime();
-    var rating = {
+    return addCache(title, {
         "title": title,
         "imdb": imdb,
         "tomatoMeter": tomatoMeter,
@@ -138,12 +138,8 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
         "metacriticScore": metacriticScore,
         "metacriticUrl": metacriticUrl,
         "year": year,
-        "date": date,
         "type": type,
-    };
-
-    CACHE[title] = JSON.stringify(rating);
-    return rating;
+    }, true);
 }
 
 /*
@@ -151,44 +147,34 @@ function addCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
  */
 function addTrailerCache(title, trailerId) {
     trailerId = trailerId || null;
-    var cachedVal = JSON.parse(CACHE[title]);
-
-    if (cachedVal === undefined) {
-        cachedVal = {
-            "title": title,
-            "trailerId": trailerId,
-        };
-    } else {
-        cachedVal.trailerId = trailerId;
-    }
-
-    CACHE.date = new Date().getTime();
-    CACHE[title] = JSON.stringify(cachedVal);
-    return cachedVal;
+    return addCache(title, {
+        "title": title,
+        "trailerId": trailerId,
+    });
 }
 
 /*
- * Add metacritic score to cache
+ * Add rotten tomato alias to cache
  */
-function addMetacriticCache(title, metacriticScore, metacriticUrl) {
-    metacriticScore = metacriticScore || null;
-    metacriticUrl = metacriticUrl || null;
+function addTomatoAliasCache(title, tomatoAliasUrl) {
+    tomatoAliasUrl = tomatoAliasUrl || null;
 
-    var cachedVal = JSON.parse(CACHE[title]);
+    return addCache(title, {
+        "tomatoAliasUrl": tomatoAliasUrl,
+    });
+}
 
-    if (cachedVal === undefined) {
-        cachedVal = {
-            "title": title,
-            "metacriticScore": metacriticScore,
-            "metacriticUrl": metacriticUrl,
-        };
+function addCache(key, values, forceWrite) {
+    var cachedVal;
+    if (key in CACHE && !forceWrite) {
+        cachedVal = JSON.parse(CACHE[key]);
+        merge(cachedVal, values);
     } else {
-        cachedVal.metacriticScore = metacriticScore;
-        cachedVal.metacriticUrl = metacriticUrl;
+        cachedVal = values;
     }
 
-    CACHE.date = new Date().getTime();
-    CACHE[title] = JSON.stringify(cachedVal);
+    cachedVal.date = new Date().getTime();
+    CACHE[key] = JSON.stringify(cachedVal);
     return cachedVal;
 }
 
@@ -293,12 +279,29 @@ function getIMDBLink(title) {
     return IMDB_LINK + title;
 }
 
+function getTomatoAPILink(imdbId) {
+    return TOMATO_API + imdbId;
+}
+
 /*
     Build the url for the rtLink
 */
-function getTomatoLink(imdbID) {
-    imdbID = imdbID.slice(2); //convert tt123456 -> 123456
-    return TOMATO_LINK + imdbID;
+function getTomatoLink(rating, callback) {
+    var imdbID = rating.imdbID.slice(2); //convert tt123456 -> 123456
+    var cached = checkCache(rating.title);
+    if (cached.inCache && cached.cachedVal.tomatoAliasUrl !== undefined) {
+        return cached.cachedVal.tomatoAliasUrl;
+    } else {
+        $.get(getTomatoAPILink(imdbID), function(res) {
+            var tomatoAliasUrl = null;
+            if (res.error === undefined) {
+                tomatoAliasUrl = res.links.alternate;
+            }
+            rating = addTomatoAliasCache(rating.title, tomatoAliasUrl);
+            callback(rating);
+        }, "json");
+    }
+    return null;
 }
 
 /*
@@ -565,7 +568,9 @@ function popupHandler(e) {
     if ($(".nr-label").contents() !== "") { //the popup isn't already up
         //null year, null addArgs
         getRating(title, null, null, function(rating) {
-            showPopupRating(rating, getRatingArgs());
+            getTomatoLink(rating, function(rating) {
+                showPopupRating(rating, getRatingArgs());
+            });
         });
 
         getTrailer(title, null, null, function(trailer) {
@@ -654,7 +659,7 @@ function getRating(title, year, addArgs, callback) {
         }
         return;
     }
-    addCache(title);
+    addRatingCache(title);
     var omdbRes = {
         "Response": "False",
     };
@@ -688,7 +693,7 @@ function getRating(title, year, addArgs, callback) {
 function processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs) {
     // both apis failed
     if (omdbRes.Response === "False" && metaRes.result === false) {
-        addCache(title);
+        addRatingCache(title);
         return null;
     }
     var imdbScore = parseFloat(omdbRes.imdbRating);
@@ -696,7 +701,7 @@ function processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs
     var tomatoUserMeter = getTomatoScore(omdbRes, "tomatoUserMeter");
     var metacriticScore = parseInt(metaRes.score);
     var metacriticUrl = metaRes.url;
-    var rating = addCache(title, imdbScore, tomatoMeter, tomatoUserMeter,
+    var rating = addRatingCache(title, imdbScore, tomatoMeter, tomatoUserMeter,
         omdbRes.imdbID, metacriticScore, metacriticUrl, year, omdbRes.Type);
     if (callback) {
         callback(rating, addArgs);
@@ -868,7 +873,9 @@ function displaySearch() {
         getRating(title, year, addArgs, function(rating, addArgs) {
             var selectObject = deepCopy(SEARCH_SEL.rating);
             selectObject.selector = addArgs.target.find(ratingSelector); // store selector to show rating
-            displayRating(rating, selectObject);
+            getTomatoLink(rating, function(rating) {
+                displayRating(rating, selectObject);
+            });
         });
 
         getTrailer(title, year, addArgs, function(trailer, addArgs) {
@@ -898,7 +905,9 @@ function displayMovie() {
     getRating(title, year, addArgs, function(rating, addArgs) {
         var selectObject = deepCopy(MOVIE_SEL.rating);
         selectObject.selector = $target.find(MOVIE_SEL.rating.selector);
-        displayRating(rating, selectObject);
+        getTomatoLink(rating, function(rating) {
+            displayRating(rating, selectObject);
+        });
     });
 
     getTrailer(title, year, addArgs, function(trailer, addArgs) {
@@ -940,7 +949,7 @@ function getTomatoHtml(rating, klass) {
     if (!rating.tomatoMeter) {
         return "<span class='rating-link tomato-filler'></span>";
     }
-    var html = $("<a class='rating-link' target='_blank' href='" + escapeHTML(getTomatoLink(rating.imdbID)) + "'><span class='tomato tomato-wrapper' title='Rotten Tomato Rating'><span class='rt-icon tomato-icon med'></span><span class='rt-score tomato-score'></span></span></a>");
+    var html = $("<a class='rating-link' target='_blank' href='" + escapeHTML(rating.tomatoAliasUrl) + "'><span class='tomato tomato-wrapper' title='Rotten Tomato Rating'><span class='rt-icon tomato-icon med'></span><span class='rt-score tomato-score'></span></span></a>");
 
     html.find(".tomato-icon").addClass(getTomatoClass(rating.tomatoMeter)).addClass(klass);
     html.find(".tomato-score").append(rating.tomatoMeter + "%");
@@ -976,7 +985,7 @@ function getTrailerPlayerHtml(trailerId, klass) {
  * Helper function for escaping API urls
  */
 function escapeHTML(str) {
-    if (str === null) {
+    if (!str) {
         return str;
     }
     return str.replace(/[&"<>]/g, function(m) {
