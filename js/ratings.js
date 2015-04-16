@@ -238,13 +238,13 @@ function getWrappedTitle(e, key, regex) {
 function clearOld(type, args) {
     var $target = $('#BobMovie');
     if (args.key in POPUP_INS_SEL[type]['movies.netflix.com']) {
-        $target.find('p.label').contents().remove();
+        $target.find('p.nr-label').contents().remove();
     }
     if (type === 'rating') {
         $target.find('.rating-link').remove();
-        $target.find('.label').remove();
+        $target.find('.nr-label').remove();
         $target.find('.ratingPredictor').remove();
-        $target.find('.bobMovieActions').remove();
+        $target.find('.nr-popup-rating-container').remove();
     } else if (type === 'trailer') {
         $target.find('.trailer-label').remove();
     }
@@ -358,6 +358,18 @@ function getMashapeAPIUrl() {
     return MASHAPE_API;
 }
 
+function getMashapePostData(title, year) {
+	var data = {
+		'title': title
+	};
+	
+	if (year !== null) {
+		data.year_from = year,
+		data.year_to = parseInt(year) + 1
+	}
+	
+	return data;
+}
 
 ///////////////// USER COUNT ////////////////
 function generateUUID() {
@@ -539,7 +551,7 @@ function prefetchChunkProcessor($slice, parser) {
 
 function popupHandler(e) {
     var title = e.data(e); //title parse funtion
-    if ($('.label').contents() !== '') { //the popup isn't already up
+    if ($('.nr-label').contents() !== '') { //the popup isn't already up
         //null year, null addArgs
         getRating(title, null, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
@@ -632,41 +644,22 @@ function getRating(title, year, addArgs, callback) {
       'result': false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
-        omdbRes = parseAPIResponse(res, {
-            'Response': 'False',
-        });
+        omdbRes = res;
 
         $.ajax({
             'type': 'POST',
             'url': getMashapeAPIUrl(),
-            'data': {
-                'title': title
-            },
+            'data': getMashapePostData(title, year),
             'headers': {
                 'X-Mashape-Key': MASHAPE_API_KEY
             },
-            'success': function(res) {
-                //search based on year and convert to single result
-                metaRes = res;
-                if (metaRes.count === 0) {
-                    metaRes = {
-                        'result': false,
-                    };
-                } else {
-                    var res;
-                    var metaYear;
-                    for (i = 0; i < metaRes.count; i++) {
-                        res = metaRes.results[i];
-                        metaYear = res.rlsdate.split('-')[0];
-                        if (year === parseInt(metaYear)) {
-                            metaRes = res;
-                            break;
-                        }
-                    }
-                    if (year === null || metaRes.max_pages !== undefined) {
-                        metaRes = metaRes.results[0];
-                    }
-                }
+            'success': function(mashapeRes) {
+				for (var i = 0; i < mashapeRes.count; i++) {
+					if (title === mashapeRes.results[i].name) {
+						metaRes = mashapeRes.results[i];
+						break;
+					}
+				}
             },
         }).always(function() {
           processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
@@ -753,13 +746,19 @@ function updateCache(title) {
     Build and display the ratings
 */
 function displayRating(rating, args) {
-    var imdbHtml = getIMDBHtml(rating, args.imdbClass);
-    var tomatoHtml = getTomatoHtml(rating, args.rtClass);
-    var metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
-    var $target = $(args.selector);
-    $target[args.insertFunc](imdbHtml);
-    $target[args.insertFunc](tomatoHtml);
-    $target[args.insertFunc](metaHtml);
+    var $imdbHtml = getIMDBHtml(rating, args.imdbClass);
+    var $tomatoHtml = getTomatoHtml(rating, args.rtClass);
+    var $metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
+	
+	var $container = $("<div>", {
+		"class": "nr-popup-rating-container"
+	});
+	$container.append($imdbHtml);
+	$container.append($tomatoHtml);
+	$container.append($metaHtml);
+	
+	var $target = $(args.selector);
+    $target[args.insertFunc]($container);
 }
 
 /*
@@ -943,7 +942,7 @@ function getTrailerLabelHtml(trailerId, klass) {
     }
     klass = klass || '';
     var html = $("<a target='_blank' id='" + trailerId + "' class='" + klass + " trailer-label' href='" + getYouTubeTrailerLink(trailerId) +
-        "'><span class='label label-default'>Trailer</span></a>");
+        "'><span class='nr-label label-default'>Trailer</span></a>");
     return html;
 
 }
