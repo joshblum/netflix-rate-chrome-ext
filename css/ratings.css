@@ -79,7 +79,16 @@
 }
 /*netflix-style*/
 
-.label {
+.nr-popup-rating-container {
+    float: right;
+    margin-bottom: 40px;
+}
+
+.nr-noop {
+    /* placeholder class */
+}
+
+.nr-label {
     margin-bottom: 15px !important;
 }
 
@@ -92,10 +101,6 @@
     font-style: normal;
     font-variant: normal;
     font-weight: normal;
-}
-
-.bobMovieRatings {
-    margin-right: 78px;
 }
 
 .dvd-popup {
@@ -127,7 +132,7 @@
     margin-right: -11px;
 }
 
-.label {
+.nr-label {
     display: inline;
     padding: .2em .6em .3em;
     font-size: 14px;
@@ -140,19 +145,19 @@
     border-radius: .25em;
 }
 
-a.label:hover,
-a.label:focus {
+a.nr-label:hover,
+a.nr-label:focus {
     color: #fff;
     text-decoration: none;
     cursor: pointer;
     background-color: #bebebe;
 }
 
-.label:empty {
+.nr-label:empty {
     display: none;
 }
 
-.btn .label {
+.btn .nr-label {
     position: relative;
     top: -1px;
 }

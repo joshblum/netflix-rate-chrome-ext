@@ -54,9 +54,10 @@ function makeSelectObject(selector, insertFunc, interval, klassDict) {
     klassDict = klassDict || {};
 
     return merge({
-        "selector": selector,
-        "insertFunc": insertFunc,
-        "interval": interval,
+        'containerKlass': 'nr-popup-rating-container',
+        'selector': selector,
+        'insertFunc': insertFunc,
+        'interval': interval,
     }, klassDict);
 }
 
@@ -242,17 +243,17 @@ function getWrappedTitle(e, key, regex) {
  * Clear old ratings and unused content. Differs for different popups
  */
 function clearOld(type, args) {
-    var $target = $("#BobMovie");
-    if (args.key in POPUP_INS_SEL[type]["movies.netflix.com"]) {
-        $target.find("p.label").contents().remove();
+    var $target = $('#BobMovie');
+    if (args.key in POPUP_INS_SEL[type]['movies.netflix.com']) {
+        $target.find('p.nr-label').contents().remove();
     }
-    if (type === "rating") {
-        $target.find(".rating-link").remove();
-        $target.find(".label").remove();
-        $target.find(".ratingPredictor").remove();
-        $target.find(".bobMovieActions").remove();
-    } else if (type === "trailer") {
-        $target.find(".trailer-label").remove();
+    if (type === 'rating') {
+        $target.find('.rating-link').remove();
+        $target.find('.nr-label').remove();
+        $target.find('.ratingPredictor').remove();
+        $target.find('.' + args.containerKlass).remove();
+    } else if (type === 'trailer') {
+        $target.find('.trailer-label').remove();
     }
 }
 
@@ -368,6 +369,18 @@ function getMashapeAPIUrl() {
     return MASHAPE_API;
 }
 
+function getMashapePostData(title, year) {
+    var data = {
+        'title': title
+    };
+
+    if (year !== null) {
+        data.year_from = year,
+            data.year_to = parseInt(year) + 1
+    }
+
+    return data;
+}
 
 ///////////////// USER COUNT ////////////////
 function generateUUID() {
@@ -549,7 +562,7 @@ function prefetchChunkProcessor($slice, parser) {
 
 function popupHandler(e) {
     var title = e.data(e); //title parse funtion
-    if ($(".label").contents() !== "") { //the popup isn't already up
+    if ($('.nr-label').contents() !== '') { //the popup isn't already up
         //null year, null addArgs
         getRating(title, null, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
@@ -615,13 +628,10 @@ function getTMDBSearchType(type) {
  * Extracts a youtube trailer id or returns null
  */
 function extractTrailerId(type, res) {
-        if (type === "movie") {
+        if (type === 'movie') {
             var youtube = res.trailers.youtube;
-            if (youtube.length === 0) {
-                return null;
-            } else {
-                return youtube[0].source;
-            }
+            if (youtube.length === 0) return null;
+            return youtube[0].source;
         } else {
             for (var result in res.results) {
                 if (result.site === "YouTube") {
@@ -644,44 +654,26 @@ function getRating(title, year, addArgs, callback) {
     }
     addCache(title);
     var omdbRes = {
-        "Response": "False",
+        'Response': 'False',
     };
     var metaRes = {
-        "result": false,
+        'result': false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
-        omdbRes = parseAPIResponse(res, {
-            "Response": "False",
-        });
+        omdbRes = res;
 
         $.ajax({
-            "type": "POST",
-            "url": getMashapeAPIUrl(),
-            "data": {
-                "title": title
+            'type': 'POST',
+            'url': getMashapeAPIUrl(),
+            'data': getMashapePostData(title, year),
+            'headers': {
+                'X-Mashape-Key': MASHAPE_API_KEY
             },
-            "headers": {
-                "X-Mashape-Key": MASHAPE_API_KEY
-            },
-            "success": function(res) {
-                //search based on year and convert to single result
-                metaRes = res;
-                if (metaRes.count === 0) {
-                    metaRes = {
-                        "result": false,
-                    };
-                } else {
-                    var metaYear;
-                    for (var i = 0; i < metaRes.count; i++) {
-                        res = metaRes.results[i];
-                        metaYear = res.rlsdate.split("-")[0];
-                        if (year === parseInt(metaYear)) {
-                            metaRes = res;
-                            break;
-                        }
-                    }
-                    if (year === null || metaRes.max_pages !== undefined) {
-                        metaRes = metaRes.results[0];
+            'success': function(mashapeRes) {
+                for (var i = 0; i < mashapeRes.count; i++) {
+                    if (title === mashapeRes.results[i].name) {
+                        metaRes = mashapeRes.results[i];
+                        break;
                     }
                 }
             },
@@ -773,13 +765,19 @@ function updateCache(title) {
  * Build and display the ratings
  */
 function displayRating(rating, args) {
-    var imdbHtml = getIMDBHtml(rating, args.imdbClass);
-    var tomatoHtml = getTomatoHtml(rating, args.rtClass);
-    var metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
+    var $imdbHtml = getIMDBHtml(rating, args.imdbClass);
+    var $tomatoHtml = getTomatoHtml(rating, args.rtClass);
+    var $metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
+
+    var $container = $("<div>", {
+        "class": args.containerKlass,
+    });
+    $container.append($imdbHtml);
+    $container.append($tomatoHtml);
+    $container.append($metaHtml);
+
     var $target = $(args.selector);
-    $target[args.insertFunc](imdbHtml);
-    $target[args.insertFunc](tomatoHtml);
-    $target[args.insertFunc](metaHtml);
+    $target[args.insertFunc]($container);
 }
 
 /*
@@ -963,7 +961,7 @@ function getTrailerLabelHtml(trailerId, klass) {
     }
     klass = klass || "";
     var html = $("<a target='_blank' id='" + trailerId + "' class='" + klass + " trailer-label' href='" + getYouTubeTrailerLink(trailerId) +
-        "'><span class='label label-default'>Trailer</span></a>");
+        "'><span class='nr-label label-default'>Trailer</span></a>");
     return html;
 
 }
@@ -1038,9 +1036,10 @@ $(document).ready(function() {
 
     //search select types
     SEARCH_SEL = {
-        "rating": makeSelectObject(".bluray", "append", -1, {
-            "imdbClass": "dvd-search-page",
-            "rtClass": "search-rt-icon",
+        'rating': makeSelectObject('.bluray', 'append', -1, {
+            'imdbClass': 'dvd-search-page',
+            'rtClass': 'search-rt-icon',
+            'containerKlass': 'nr-noop'
         }),
         "trailer": makeSelectObject(".synopsis", "before", 800, {
             "trailerClass": "dvd-trailer-label",
