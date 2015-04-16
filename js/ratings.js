@@ -359,16 +359,16 @@ function getMashapeAPIUrl() {
 }
 
 function getMashapePostData(title, year) {
-	var data = {
-		'title': title
-	};
-	
-	if (year !== null) {
-		data.year_from = year,
-		data.year_to = parseInt(year) + 1
-	}
-	
-	return data;
+    var data = {
+        'title': title
+    };
+
+    if (year !== null) {
+        data.year_from = year,
+            data.year_to = parseInt(year) + 1
+    }
+
+    return data;
 }
 
 ///////////////// USER COUNT ////////////////
@@ -612,22 +612,22 @@ function getTMDBSearchType(type) {
  * Extracts a youtube trailer id or returns null
  */
 function extractTrailerId(type, res) {
-    if (type === 'movie') {
-        var youtube = res.trailers.youtube;
-        if (youtube.length === 0) return null;
-        return youtube[0].source;
-    } else {
-        for (var result in res.results) {
-            if (result.site === "YouTube") {
-                return result.key;
+        if (type === 'movie') {
+            var youtube = res.trailers.youtube;
+            if (youtube.length === 0) return null;
+            return youtube[0].source;
+        } else {
+            for (var result in res.results) {
+                if (result.site === "YouTube") {
+                    return result.key;
+                }
             }
+            return null;
         }
-        return null;
     }
-}
-/*
-    Search for the title, first in the CACHE and then through the API
-*/
+    /*
+        Search for the title, first in the CACHE and then through the API
+    */
 function getRating(title, year, addArgs, callback) {
     var cached = checkCache(title);
     if (cached.inCache) {
@@ -638,10 +638,10 @@ function getRating(title, year, addArgs, callback) {
     }
     addCache(title);
     var omdbRes = {
-      'Response': 'False',
+        'Response': 'False',
     };
     var metaRes = {
-      'result': false,
+        'result': false,
     };
     $.get(getIMDBAPI(title, year), function(res) {
         omdbRes = res;
@@ -654,15 +654,15 @@ function getRating(title, year, addArgs, callback) {
                 'X-Mashape-Key': MASHAPE_API_KEY
             },
             'success': function(mashapeRes) {
-				for (var i = 0; i < mashapeRes.count; i++) {
-					if (title === mashapeRes.results[i].name) {
-						metaRes = mashapeRes.results[i];
-						break;
-					}
-				}
+                for (var i = 0; i < mashapeRes.count; i++) {
+                    if (title === mashapeRes.results[i].name) {
+                        metaRes = mashapeRes.results[i];
+                        break;
+                    }
+                }
             },
         }).always(function() {
-          processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
+            processRatingResponses(title, year, omdbRes, metaRes, callback, addArgs);
         });
     });
 }
@@ -749,15 +749,15 @@ function displayRating(rating, args) {
     var $imdbHtml = getIMDBHtml(rating, args.imdbClass);
     var $tomatoHtml = getTomatoHtml(rating, args.rtClass);
     var $metaHtml = getMetatcriticHtml(rating, args.metacriticClass);
-	
-	var $container = $("<div>", {
-		"class": "nr-popup-rating-container"
-	});
-	$container.append($imdbHtml);
-	$container.append($tomatoHtml);
-	$container.append($metaHtml);
-	
-	var $target = $(args.selector);
+
+    var $container = $("<div>", {
+        "class": "nr-popup-rating-container"
+    });
+    $container.append($imdbHtml);
+    $container.append($tomatoHtml);
+    $container.append($metaHtml);
+
+    var $target = $(args.selector);
     $target[args.insertFunc]($container);
 }
 
