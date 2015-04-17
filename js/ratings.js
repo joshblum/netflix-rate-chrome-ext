@@ -640,8 +640,9 @@ function extractTrailerId(type, res) {
             var youtube = res.trailers.youtube;
             if (youtube.length === 0) {
                 return null;
+            } else {
+                return youtube[0].source;
             }
-            return youtube[0].source;
         } else {
             for (var result in res.results) {
                 if (result.site === "YouTube") {
@@ -669,9 +670,7 @@ function getRating(title, year, addArgs, callback) {
     var metaRes = {
         "result": false,
     };
-    $.get(getIMDBAPI(title, year), function(res) {
-        omdbRes = res;
-
+    $.get(getIMDBAPI(title, year), function(omdbRes) {
         $.ajax({
             "type": "POST",
             "url": getMashapeAPIUrl(),
