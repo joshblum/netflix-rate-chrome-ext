@@ -289,22 +289,24 @@ function getTomatoAPILink(imdbId) {
 function getTomatoLink(rating, callback) {
     if (!rating.imdbID) {
         callback(rating);
+        return null;
     }
+    var tomatoAliasUrl = null;
     var imdbID = rating.imdbID.slice(2); //convert tt123456 -> 123456
     var cached = checkCache(rating.title);
     if (cached.inCache && cached.cachedVal.tomatoAliasUrl !== undefined) {
-        return cached.cachedVal.tomatoAliasUrl;
+        tomatoAliasUrl = cached.cachedVal.tomatoAliasUrl;
     } else {
         $.get(getTomatoAPILink(imdbID), function(res) {
-            var tomatoAliasUrl = null;
             if (res.error === undefined) {
                 tomatoAliasUrl = res.links.alternate;
+                rating = addTomatoAliasCache(rating.title, tomatoAliasUrl);
             }
-            rating = addTomatoAliasCache(rating.title, tomatoAliasUrl);
-            callback(rating);
         }, "json");
     }
-    return null;
+
+    callback(rating);
+    return tomatoAliasUrl;
 }
 
 /*
