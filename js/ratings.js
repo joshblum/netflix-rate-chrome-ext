@@ -296,14 +296,16 @@ function getTomatoLink(rating, callback) {
     if (cached.inCache && cached.cachedVal.tomatoAliasUrl !== undefined) {
         callback(rating);
     } else {
+        var tomatoAliasUrl = null;
         $.get(getTomatoAPILink(imdbID), function(res) {
             if (res.error === undefined) {
-                var tomatoAliasUrl = res.links.alternate;
-                rating = addTomatoAliasCache(rating.title, tomatoAliasUrl);
+                tomatoAliasUrl = res.links.alternate;
             }
-
+        }, "json")
+        .always(function() {
+            rating = addTomatoAliasCache(rating.title, tomatoAliasUrl);
             callback(rating);
-        }, "json");
+        });
     }
 }
 
