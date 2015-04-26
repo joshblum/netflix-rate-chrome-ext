@@ -296,7 +296,7 @@ function getTomatoLink(rating, callback) {
     if (cached.inCache && cached.cachedVal.tomatoAliasUrl !== undefined) {
         callback(rating);
     } else {
-        var tomatoAliasUrl = null;
+        var tomatoAliasUrl = "";
         $.get(getTomatoAPILink(imdbID), function(res) {
             if (res.error === undefined) {
                 tomatoAliasUrl = res.links.alternate;
