@@ -146,7 +146,7 @@ function addRatingCache(title, imdb, tomatoMeter, tomatoUserMeter, imdbID,
  * Add a trailer to cache
  */
 function addTrailerCache(title, trailerId) {
-    trailerId = trailerId || null;
+    trailerId = trailerId || "";
     return addCache(title, {
         "title": title,
         "trailerId": trailerId,
@@ -157,7 +157,7 @@ function addTrailerCache(title, trailerId) {
  * Add rotten tomato alias to cache
  */
 function addTomatoAliasCache(title, tomatoAliasUrl) {
-    tomatoAliasUrl = tomatoAliasUrl || null;
+    tomatoAliasUrl = tomatoAliasUrl || "";
 
     return addCache(title, {
         "tomatoAliasUrl": tomatoAliasUrl,
