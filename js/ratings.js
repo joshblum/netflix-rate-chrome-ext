@@ -1,3 +1,5 @@
+/* global chrome */
+/// <reference path="../typings/jquery/jquery.d.ts"/>
 "use strict";
 
 var TMDB_API_KEY = "04a87a053afac639272eefbb94a173e4";
@@ -28,6 +30,7 @@ var PREFETCH_SEL = {
 
 var CACHE = localStorage;
 var CACHE_LIFE = 1000 * 60 * 60 * 24 * 7 * 2; //two weeks in milliseconds
+var CACHE_VERSION = 2;
 var UUID_KEY = "uuid";
 var DATE_KEY = "created_at";
 
@@ -173,8 +176,10 @@ function addCache(key, values, forceWrite) {
         cachedVal = values;
     }
 
-    cachedVal.date = new Date().getTime();
-    CACHE[key] = JSON.stringify(cachedVal);
+    cachedVal.date = getTime();
+    cachedVal.cacheVersion = CACHE_VERSION;
+    
+    CACHE.setItem(key, JSON.stringify(cachedVal));
     return cachedVal;
 }
 
@@ -190,7 +195,7 @@ function checkCache(title) {
     var cachedVal = JSON.parse(CACHE[title]);
     var inCache = false;
     if (cachedVal !== undefined) {
-        inCache = isValidCacheEntry(cachedVal.date);
+        inCache = isValidCacheEntry(cachedVal);
     }
     return {
         "inCache": inCache,
@@ -200,12 +205,23 @@ function checkCache(title) {
 }
 
 /*
- * returns whether a date exceeds the CACHE_LIFE
+ * Whether the cache entry lifetime is smaller than CACHE_LIFE and the cache version is current
  */
-function isValidCacheEntry(date) {
-    var now = new Date().getTime();
-    var lifetime = now - date;
-    return lifetime <= CACHE_LIFE;
+function isValidCacheEntry(cacheEntry) {
+    var now = getTime();
+    var lifetime = now - cacheEntry.date;
+    
+    var cacheVersion = null;
+    
+    if (typeof cacheEntry.cacheVersion !== "undefined") {
+        cacheVersion = cacheEntry.cacheVersion;
+    }
+    
+    return lifetime <= CACHE_LIFE && cacheVersion === CACHE_VERSION;
+}
+
+function getTime() {
+    return new Date().getTime();
 }
 
 /*
@@ -412,7 +428,13 @@ function uuidIsExpired() {
         return true;
     }
     date = Date.parse(date); // convert to ms
-    return !isValidCacheEntry(date);
+    
+    var cacheEntry = {
+      date: date,
+      cacheVersion: CACHE_VERSION  
+    };
+    
+    return !isValidCacheEntry(cacheEntry);
 }
 
 function setUUID() {
@@ -761,7 +783,7 @@ function updateCache(title) {
         return;
     }
     var cachedVal = cached.cachedVal;
-    if (cachedVal.year === null && !isValidCacheEntry(cachedVal.date)) {
+    if (cachedVal.year === null && !isValidCacheEntry(cachedVal)) {
         var year = parseYear();
         getRating(title, year, null, function(rating) {
             showPopupRating(rating, getRatingArgs());
